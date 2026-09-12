@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>منشئ تقرير تنفيذ البرامج</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body><div class="bar"></div><main class="wrap">
+<section class="hero"><h1>منشئ تقرير تنفيذ البرامج</h1><div class="credit">إعداد مركز مصادر التعلم - متوسطة جميلة بنت عمر بن الخطاب<br><strong>أشواق محمد</strong></div><div class="counter">عدد التقارير المنشأة باستخدام الصفحة: <b id="reportCounter">—</b></div></section>
+<section class="card"><h2>بيانات التقرير</h2>
+<div class="row"><div class="field"><label>اسم البرنامج <span class="hint">(عربي أو English)</span></label><input id="program" placeholder="مثال: مهارات التعلم الذاتي / Self-Learning Skills"></div><div class="field"><label>تاريخ التنفيذ <span class="hint">(هجري - تقويم أم القرى)</span></label><div class="hdate"><select id="hDay"></select><select id="hMonth"></select><select id="hYear"></select></div><div id="hijriPreview" class="hint" style="margin-top:5px"></div></div></div>
+<div class="row"><div class="field"><label>الفئة المستهدفة</label><input id="target" placeholder="مثال: طالبات الصف الثاني المتوسط"></div><div class="field"><label>عدد المستفيدات</label><input id="count" inputmode="numeric" placeholder="مثال: 35"></div></div>
+<div class="field"><label>الهدف من البرنامج</label><textarea id="goal"></textarea></div><div class="field"><label>إجراءات التنفيذ</label><textarea id="steps"></textarea></div><div class="field"><label>النتائج والمخرجات</label><textarea id="results"></textarea></div><div class="field"><label>اسم معدة التقرير</label><input id="preparer" placeholder="اسم معدة التقرير"></div></section>
+<section class="card"><h2>الشواهد</h2><div class="summary">يمكن إضافة <b>4 صور كحد أقصى</b>. ستظهر الشواهد في الصفحة الثانية من ملف PDF.</div><div class="field" style="margin-top:10px"><input id="images" type="file" accept="image/*" multiple></div><div class="photos" id="photos"></div></section>
+<section class="card"><div class="summary"><span class="badge">PDF من صفحتين A4</span><span class="badge">بدون رابط الموقع أو وقت التحميل</span><span class="badge">العربية: المهند Bold</span><span class="badge">English: Helvetica</span><span class="badge">4 شواهد</span></div><div class="actions"><button class="primary" id="pdfBtn">تحميل PDF عالي الجودة</button><button class="secondary" id="saveBtn">حفظ البيانات</button><button class="secondary danger" id="clearBtn">مسح الحقول</button></div><div id="notice" class="notice"></div></section>
+<div class="footer">مركز مصادر التعلم - متوسطة جميلة بنت عمر بن الخطاب</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" onerror="this.onerror=null;this.src='https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js'"></script>
+<script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js" onerror="this.onerror=null;this.src='https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js'"></script>
+<script src="app.js"></script>
+<script src="pdf.js"></script>
+</body></html>
