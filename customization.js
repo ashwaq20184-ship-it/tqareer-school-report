@@ -65,9 +65,10 @@
     const tableFill=selectedTableFill();
     const labelColor=tableLabelColor();
     const labelSize=tableLabelSize();
+    const titleColor=isPurpleSelected()?C.dark:C.blue;
     const deputy=selectedDeputy();
     header(page,font,logo);
-    drawTextTop(page,font,30,43,150,'تقرير تنفيذ '+(d.program||'........................'),20,C.blue,'center');
+    drawTextTop(page,font,30,43,150,'تقرير تنفيذ '+(d.program||'........................'),20,titleColor,'center');
     let y=55,h=14;
     cell(page,font,165,y,35,h,'اسم البرنامج',tableFill,labelColor,labelSize,'center');
     cell(page,font,105,y,60,h,d.program,null,C.dark,12.5);
