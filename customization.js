@@ -6,13 +6,23 @@
     none:null
   };
   const purple=[218,167,201]; // #DAA7C9
+  function isPurpleSelected(){
+    const el=byId('tableColor');
+    return !!(el&&el.value==='purple');
+  }
   function selectedDeputy(){
     const el=byId('deputyChoice');
     return deputyMap[(el&&el.value)||'educational']||null;
   }
   function selectedTableFill(){
-    const el=byId('tableColor');
-    return el&&el.value==='purple'?purple:C.gray;
+    return isPurpleSelected()?purple:C.gray;
+  }
+  function tableLabelColor(){
+    return isPurpleSelected()?C.dark:C.blue;
+  }
+  function tableLabelSize(){
+    // خط المهند المستخدم في PDF هو AL-Mohanad Bold أصلًا؛ نزيد الحجم قليلًا عند اختيار البنفسجي لإبراز الـ Bold بصريًا.
+    return isPurpleSelected()?13.2:12.5;
   }
 
   // حفظ خيارات التخصيص مع بقية بيانات التقرير واستعادتها على الجهاز نفسه.
@@ -53,22 +63,24 @@
   // نستبدل فقط رسم التقرير والشواهد، مع إبقاء محرك PDF وبقية الخصائص كما هي.
   drawReport=function(page,font,logo,d){
     const tableFill=selectedTableFill();
+    const labelColor=tableLabelColor();
+    const labelSize=tableLabelSize();
     const deputy=selectedDeputy();
     header(page,font,logo);
     drawTextTop(page,font,30,43,150,'تقرير تنفيذ '+(d.program||'........................'),20,C.blue,'center');
     let y=55,h=14;
-    cell(page,font,165,y,35,h,'اسم البرنامج',tableFill,C.blue,12.5,'center');
+    cell(page,font,165,y,35,h,'اسم البرنامج',tableFill,labelColor,labelSize,'center');
     cell(page,font,105,y,60,h,d.program,null,C.dark,12.5);
-    cell(page,font,70,y,35,h,'تاريخ التنفيذ',tableFill,C.blue,12.5,'center');
+    cell(page,font,70,y,35,h,'تاريخ التنفيذ',tableFill,labelColor,labelSize,'center');
     cell(page,font,10,y,60,h,d.date,null,C.dark,12.5,'center');
     y+=h;
-    cell(page,font,165,y,35,h,'الفئة المستهدفة',tableFill,C.blue,12.5,'center');
+    cell(page,font,165,y,35,h,'الفئة المستهدفة',tableFill,labelColor,labelSize,'center');
     cell(page,font,105,y,60,h,d.target,null,C.dark,12.5);
-    cell(page,font,70,y,35,h,'عدد المستفيدات',tableFill,C.blue,12.5,'center');
+    cell(page,font,70,y,35,h,'عدد المستفيدات',tableFill,labelColor,labelSize,'center');
     cell(page,font,10,y,60,h,d.count,null,C.dark,12.5,'center');
     y+=h;
     for(const [lab,txt,rh] of [['الهدف من البرنامج',d.goal,30],['إجراءات التنفيذ',d.steps,34],['النتائج والمخرجات',d.results,34],['الشواهد','مرفقة في الصفحة الثانية من التقرير',18]]){
-      cell(page,font,165,y,35,rh,lab,tableFill,C.blue,12.5,'center');
+      cell(page,font,165,y,35,rh,lab,tableFill,labelColor,labelSize,'center');
       cell(page,font,10,y,155,rh,txt,null,C.dark,12.5,'right',2,rh>=30);
       y+=rh;
     }
