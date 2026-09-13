@@ -98,8 +98,9 @@
 
   drawEvidence=async function(page,font,logo,doc,d){
     const deputy=selectedDeputy();
+    const titleColor=isPurpleSelected()?C.dark:C.blue;
     header(page,font,logo);
-    drawTextTop(page,font,30,44,150,'شواهد تنفيذ البرنامج',21,C.blue,'center');
+    drawTextTop(page,font,30,44,150,'شواهد تنفيذ البرنامج',21,titleColor,'center');
     drawTextTop(page,font,25,53,160,(d.program||'........................')+'   '+d.date,12.5,[85,85,85],'center');
     const pos=[[107,63],[12,63],[107,146],[12,146]];
     for(let i=0;i<4;i++){
