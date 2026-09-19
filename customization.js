@@ -88,7 +88,7 @@
     cell(page,font,70,y,35,h,'عدد المستفيدات',tableFill,labelColor,labelSize,'center');
     cell(page,font,10,y,60,h,d.count,null,C.dark,12.5,'center');
     y+=h;
-    for(const [lab,txt,rh] of [['الهدف من '+reportType,d.goal,30],['إجراءات التنفيذ',d.steps,34],['المخرجات وقياس الأثر',d.results,34],['الشواهد','مرفقة في الصفحات التالية من التقرير',18]]){
+    for(const [lab,txt,rh] of [['الهدف من '+reportType,d.goal,30],['إجراءات التنفيذ',d.steps,34],['المخرجات وقياس الأثر',d.results,34]]){
       cell(page,font,165,y,35,rh,lab,tableFill,labelColor,labelSize,'center');
       cell(page,font,10,y,155,rh,txt,null,C.dark,12.5,'right',2,rh>=30);
       y+=rh;
@@ -215,8 +215,7 @@
     const sections=[
       {label:'الهدف من '+reportType,text:d.goal,minH:30},
       {label:'إجراءات التنفيذ',text:d.steps,minH:34},
-      {label:'المخرجات وقياس الأثر',text:d.results,minH:34},
-      {label:'الشواهد',text:'مرفقة في الصفحات التالية من التقرير',minH:18}
+      {label:'المخرجات وقياس الأثر',text:d.results,minH:34}
     ];
     const lh=reportLineHeight(12.5);
 
