@@ -111,15 +111,13 @@
     header(page,font,logo);
     drawTextTop(page,font,30,44,150,'شواهد تنفيذ '+reportType,21,titleColor,'center');
     drawTextTop(page,font,25,53,160,(d.program||'........................')+'   '+d.date,12.5,[85,85,85],'center');
-    const allImages=(typeof evidenceImages!=='undefined'?evidenceImages:(d.images||[])).slice(0,10);
-    const slotCount=Math.max(4,allImages.length);
-    const rows=slotCount<=4?2:Math.ceil(slotCount/2);
-    const yStart=63,gridHeight=164,gap=3,rowH=(gridHeight-gap*(rows-1))/rows;
-    for(let i=0;i<slotCount;i++){
-      const col=i%2,row=Math.floor(i/2),x=col===0?107:12,y=yStart+row*(rowH+gap);
-      rectTop(page,x,y,91,rowH,null,C.border,.35);
+    const allImages=(d.images||[]).slice(0,4);
+    const pos=[[107,63],[12,63],[107,146],[12,146]];
+    for(let i=0;i<4;i++){
+      const [x,y]=pos[i];
+      rectTop(page,x,y,91,79,null,C.border,.35);
       if(allImages[i]){
-        try{fitImg(page,await embedDataImage(doc,allImages[i]),x+1.5,y+1.5,88,rowH-3)}catch(e){}
+        try{fitImg(page,await embedDataImage(doc,allImages[i]),x+2,y+2,87,75)}catch(e){}
       }
     }
     lineTop(page,10,232,200,232,[205,205,205],.3);
