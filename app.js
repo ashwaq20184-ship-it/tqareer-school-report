@@ -1,4 +1,4 @@
-const $=id=>document.getElementById(id), ids=['program','target','count','goal','steps','results','preparer'];let evidenceImages=[];
+const $=id=>document.getElementById(id), ids=['program','target','count','goal','steps','results','preparer'];let evidenceImages=[],evidenceTitles=Array(12).fill('');
 const monthNames=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
 // أطوال أشهر تقويم أم القرى مثبتة مسبقًا حتى تعمل القوائم على Safari/iPhone دون الاعتماد على دعم Intl في الجهاز.
 const HIJRI_MONTH_LENGTHS={
@@ -57,12 +57,31 @@ $('hMonth').addEventListener('change',()=>{fillDays($('hDay').value);updateDate(
 $('hDay').addEventListener('change',updateDate);
 function show(msg){$('notice').textContent=msg;$('notice').classList.add('show')}function hide(){$('notice').classList.remove('show')}
 async function compressImage(file,maxW=1200,maxH=1200,q=.76){return new Promise((res,rej)=>{const r=new FileReader();r.onerror=rej;r.onload=e=>{const im=new Image();im.onerror=rej;im.onload=()=>{let s=Math.min(1,maxW/im.naturalWidth,maxH/im.naturalHeight),w=Math.max(1,Math.round(im.naturalWidth*s)),h=Math.max(1,Math.round(im.naturalHeight*s)),c=document.createElement('canvas');c.width=w;c.height=h;let x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);res(c.toDataURL('image/jpeg',q))};im.src=e.target.result};r.readAsDataURL(file)})}
-function renderPhotos(){$('photos').innerHTML='';for(let i=0;i<12;i++){const d=document.createElement('div');d.className='photo';if(evidenceImages[i]){const im=new Image();im.src=evidenceImages[i];d.appendChild(im)}else d.textContent=`الشاهد ${i+1}`;$('photos').appendChild(d)}}renderPhotos();
-$('images').addEventListener('change',async()=>{evidenceImages=[];show('جارٍ تجهيز صور الشواهد...');for(const f of [...$('images').files].slice(0,12)){try{evidenceImages.push(await compressImage(f))}catch(e){}}renderPhotos();show(`تم تجهيز ${evidenceImages.length} من 12 شاهدًا.`)});
+function renderPhotos(){
+  $('photos').innerHTML='';
+  for(let i=0;i<12;i++){
+    const d=document.createElement('div');d.className='photo';
+    const preview=document.createElement('div');preview.className='photo-preview';
+    if(evidenceImages[i]){
+      const im=new Image();im.src=evidenceImages[i];preview.appendChild(im);
+      const inp=document.createElement('input');
+      inp.className='evidence-title';
+      inp.type='text';
+      inp.placeholder='عنوان الشاهد (اختياري)';
+      inp.value=evidenceTitles[i]||'';
+      inp.addEventListener('input',()=>{evidenceTitles[i]=inp.value});
+      d.appendChild(preview);d.appendChild(inp);
+    }else{
+      preview.classList.add('empty');preview.textContent=`الشاهد ${i+1}`;d.appendChild(preview);
+    }
+    $('photos').appendChild(d);
+  }
+}renderPhotos();
+$('images').addEventListener('change',async()=>{evidenceImages=[];evidenceTitles=Array(12).fill('');show('جارٍ تجهيز صور الشواهد...');for(const f of [...$('images').files].slice(0,12)){try{evidenceImages.push(await compressImage(f))}catch(e){}}renderPhotos();show(`تم تجهيز ${evidenceImages.length} من 12 شاهدًا.`)});
 const COUNTER_URL='https://ebsrurheeqyiexcfcehx.supabase.co',COUNTER_KEY='sb_publishable_iBthlnseptMOOcKGPE5nbQ_PlsDvaml';
 async function refreshCounter(){try{const r=await fetch(COUNTER_URL+'/rest/v1/report_page_counter?select=total&id=eq.1',{headers:{apikey:COUNTER_KEY}}),d=await r.json();if(d&&d[0])$('reportCounter').textContent=Number(d[0].total).toLocaleString('ar-SA')}catch(e){if($('reportCounter').textContent==='—')$('reportCounter').textContent='غير متاح'}}
 async function incrementCounter(){try{const r=await fetch(COUNTER_URL+'/rest/v1/rpc/increment_report_page_counter',{method:'POST',headers:{apikey:COUNTER_KEY,'Content-Type':'application/json'},body:'{}'}),n=await r.json();if(n!=null)$('reportCounter').textContent=Number(n).toLocaleString('ar-SA')}catch(e){}}
 refreshCounter();setInterval(refreshCounter,30000);
-$('saveBtn').onclick=()=>{const o={};ids.forEach(id=>o[id]=$(id).value);o.hYear=$('hYear').value;o.hMonth=$('hMonth').value;o.hDay=$('hDay').value;localStorage.setItem('schoolReport',JSON.stringify(o));show('تم حفظ البيانات على هذا الجهاز.')};
-function load(){try{const o=JSON.parse(localStorage.getItem('schoolReport')||'{}');ids.forEach(id=>{if(o[id])$(id).value=o[id]});if(o.hYear)fillYears(o.hYear);if(o.hMonth)fillMonths(o.hMonth);fillDays(o.hDay);updateDate()}catch(e){}}load();
-$('clearBtn').onclick=()=>{if(!confirm('هل تريدين مسح جميع الحقول؟'))return;ids.forEach(id=>$(id).value='');$('images').value='';evidenceImages=[];renderPhotos();localStorage.removeItem('schoolReport');show('تم مسح الحقول.')};
+$('saveBtn').onclick=()=>{const o={};ids.forEach(id=>o[id]=$(id).value);o.hYear=$('hYear').value;o.hMonth=$('hMonth').value;o.hDay=$('hDay').value;o.evidenceTitles=evidenceTitles;localStorage.setItem('schoolReport',JSON.stringify(o));show('تم حفظ البيانات على هذا الجهاز.')};
+function load(){try{const o=JSON.parse(localStorage.getItem('schoolReport')||'{}');ids.forEach(id=>{if(o[id])$(id).value=o[id]});if(o.hYear)fillYears(o.hYear);if(o.hMonth)fillMonths(o.hMonth);if(Array.isArray(o.evidenceTitles))evidenceTitles=o.evidenceTitles.slice(0,12).concat(Array(12).fill('')).slice(0,12);fillDays(o.hDay);updateDate();renderPhotos()}catch(e){}}load();
+$('clearBtn').onclick=()=>{if(!confirm('هل تريدين مسح جميع الحقول؟'))return;ids.forEach(id=>$(id).value='');$('images').value='';evidenceImages=[];evidenceTitles=Array(12).fill('');renderPhotos();localStorage.removeItem('schoolReport');show('تم مسح الحقول.')};
