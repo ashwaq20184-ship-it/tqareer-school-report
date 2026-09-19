@@ -132,12 +132,21 @@
     drawTextTop(page,font,30,44,150,'شواهد تنفيذ '+reportType,21,titleColor,'center');
     drawTextTop(page,font,25,53,160,(d.program||'........................')+'   '+d.date,12.5,[85,85,85],'center');
     const allImages=(d.images||[]).slice(0,4);
+    const allTitles=(d.evidenceTitles||[]).slice(0,4);
     const pos=[[107,63],[12,63],[107,146],[12,146]];
     for(let i=0;i<4;i++){
-      const [x,y]=pos[i];
+      const [x,y]=pos[i],caption=String(allTitles[i]||'').trim();
       rectTop(page,x,y,91,79,null,C.border,.35);
       if(allImages[i]){
-        try{fitImg(page,await embedDataImage(doc,allImages[i]),x+2,y+2,87,75)}catch(e){}
+        try{
+          const imageH=caption?63:75;
+          fitImg(page,await embedDataImage(doc,allImages[i]),x+2,y+2,87,imageH);
+        }catch(e){}
+      }
+      if(caption){
+        lineTop(page,x+2,y+67,x+89,y+67,[220,220,220],.25);
+        const lines=wrapText(font,caption,mm(87),11.5,2);
+        for(let j=0;j<lines.length;j++)drawMixed(page,font,x+2,y+68+j*4.7,87,lines[j],11.5,C.dark,'center');
       }
     }
     lineTop(page,10,232,200,232,[205,205,205],.3);
@@ -292,10 +301,11 @@
     drawReportPages(doc,font,logo,d);
 
     const imgs=(d.images||[]).slice(0,12);
+    const titles=(typeof evidenceTitles!=='undefined'?evidenceTitles:(d.evidenceTitles||[])).slice(0,12);
     const evidencePages=Math.max(1,Math.ceil(imgs.length/4));
     for(let i=0;i<evidencePages;i++){
       const p=doc.addPage([A4W,A4H]);
-      await drawEvidence(p,font,logo,doc,{...d,images:imgs.slice(i*4,i*4+4),evidencePage:i+1,evidencePages});
+      await drawEvidence(p,font,logo,doc,{...d,images:imgs.slice(i*4,i*4+4),evidenceTitles:titles.slice(i*4,i*4+4),evidencePage:i+1,evidencePages});
     }
     doc.setTitle('تقرير تنفيذ '+selectedReportType());
     doc.setCreator('مركز مصادر التعلم - متوسطة جميلة بنت عمر بن الخطاب');
