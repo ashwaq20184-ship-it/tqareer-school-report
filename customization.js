@@ -88,7 +88,7 @@
     cell(page,font,70,y,35,h,'عدد المستفيدات',tableFill,labelColor,labelSize,'center');
     cell(page,font,10,y,60,h,d.count,null,C.dark,12.5,'center');
     y+=h;
-    for(const [lab,txt,rh] of [['الهدف من '+reportType,d.goal,30],['إجراءات التنفيذ',d.steps,34],['المخرجات وقياس الأثر',d.results,34],['الشواهد','مرفقة في الصفحة الثانية من التقرير',18]]){
+    for(const [lab,txt,rh] of [['الهدف من '+reportType,d.goal,30],['إجراءات التنفيذ',d.steps,34],['المخرجات وقياس الأثر',d.results,34],['الشواهد','مرفقة في الصفحات التالية من التقرير',18]]){
       cell(page,font,165,y,35,rh,lab,tableFill,labelColor,labelSize,'center');
       cell(page,font,10,y,155,rh,txt,null,C.dark,12.5,'right',2,rh>=30);
       y+=rh;
@@ -132,4 +132,155 @@
     }
     bar(page,290);
   };
+
+  // معالجة النصوص الطويلة: لا يتم قصها، بل تتمدد تلقائيًا إلى صفحات تقرير إضافية.
+  function reportLineHeight(size){return Math.max(4.9,(size*1.22)/MM)}
+  function wrapAllReportText(font,text,widthMm,size){
+    const t=String(text??'').trim();
+    if(!t)return [''];
+    return wrapText(font,t,mm(widthMm),size,100000);
+  }
+  function drawReportTextCell(page,font,x,y,w,h,lines,size=12.5,pad=2){
+    rectTop(page,x,y,w,h,null,C.dark,.35);
+    const lh=reportLineHeight(size);
+    for(let i=0;i<lines.length;i++){
+      drawMixed(page,font,x+pad,y+pad+i*lh,w-2*pad,lines[i],size,C.dark,'right');
+    }
+  }
+  function reportValueHeight(font,text,widthMm,size=12.5,minH=14){
+    const lines=wrapAllReportText(font,text,widthMm-4,size);
+    return Math.max(minH,lines.length*reportLineHeight(size)+4);
+  }
+  function drawReportPageFrame(page,font,logo,title,titleColor,continuation=false){
+    header(page,font,logo);
+    const t=continuation?'متابعة '+title:title;
+    const titleLines=wrapText(font,t,mm(150),20,3);
+    const first=titleLines[0]||t;
+    drawTextTop(page,font,30,43,150,first,20,titleColor,'center');
+    if(titleLines[1])drawTextTop(page,font,30,49,150,titleLines[1],16,titleColor,'center');
+    bar(page,290);
+  }
+  function drawReportSignatures(page,font,d,deputy){
+    drawTextTop(page,font,10,213,190,'معدة التقرير',13.5,C.red,'right');
+    drawTextTop(page,font,10,220,190,d.preparer||'—',13.5,C.dark,'right');
+    if(deputy){
+      drawTextTop(page,font,105,237,95,deputy.label,13.5,C.red,'right');
+      drawTextTop(page,font,105,245,95,deputy.name,13.5,C.dark,'right');
+    }
+    drawTextTop(page,font,10,237,95,'مديرة المدرسة',13.5,C.red,'right');
+    drawTextTop(page,font,10,245,95,'حنان الغامدي',13.5,C.dark,'right');
+  }
+  function drawPairRow(page,font,y,h,leftLabel,leftText,rightLabel,rightText,tableFill,labelColor,labelSize){
+    cell(page,font,165,y,35,h,leftLabel,tableFill,labelColor,labelSize,'center');
+    drawReportTextCell(page,font,105,y,60,h,wrapAllReportText(font,leftText,56,12.5),12.5,2);
+    cell(page,font,70,y,35,h,rightLabel,tableFill,labelColor,labelSize,'center');
+    drawReportTextCell(page,font,10,y,60,h,wrapAllReportText(font,rightText,56,12.5),12.5,2);
+  }
+  function drawLongSection(page,font,y,h,label,lines,tableFill,labelColor,labelSize){
+    cell(page,font,165,y,35,h,label,tableFill,labelColor,labelSize,'center');
+    drawReportTextCell(page,font,10,y,155,h,lines,12.5,2);
+  }
+  function drawReportPages(doc,font,logo,d){
+    const tableFill=selectedTableFill();
+    const labelColor=tableLabelColor();
+    const labelSize=tableLabelSize();
+    const titleColor=isPurpleSelected()?C.dark:C.blue;
+    const reportType=selectedReportType();
+    const deputy=selectedDeputy();
+    const title='تقرير تنفيذ '+reportType+' '+(d.program||'........................');
+    const bottom=205;
+    let page=doc.addPage([A4W,A4H]);
+    let continuation=false;
+    drawReportPageFrame(page,font,logo,title,titleColor,false);
+    let y=55;
+
+    const row1H=Math.max(
+      reportValueHeight(font,d.program,60,12.5,14),
+      reportValueHeight(font,d.date,60,12.5,14)
+    );
+    drawPairRow(page,font,y,row1H,'اسم '+reportType,d.program,'تاريخ التنفيذ',d.date,tableFill,labelColor,labelSize);
+    y+=row1H;
+
+    const row2H=Math.max(
+      reportValueHeight(font,d.target,60,12.5,14),
+      reportValueHeight(font,d.count,60,12.5,14)
+    );
+    if(y+row2H>bottom){
+      page=doc.addPage([A4W,A4H]); continuation=true;
+      drawReportPageFrame(page,font,logo,title,titleColor,true); y=55;
+    }
+    drawPairRow(page,font,y,row2H,'الفئة المستهدفة',d.target,'عدد المستفيدات',d.count,tableFill,labelColor,labelSize);
+    y+=row2H;
+
+    const sections=[
+      {label:'الهدف من '+reportType,text:d.goal,minH:30},
+      {label:'إجراءات التنفيذ',text:d.steps,minH:34},
+      {label:'المخرجات وقياس الأثر',text:d.results,minH:34},
+      {label:'الشواهد',text:'مرفقة في الصفحات التالية من التقرير',minH:18}
+    ];
+    const lh=reportLineHeight(12.5);
+
+    for(const sec of sections){
+      let lines=wrapAllReportText(font,sec.text,151,12.5);
+      let offset=0,part=0;
+      while(offset<lines.length){
+        let remaining=lines.length-offset;
+        let need=Math.max(sec.minH,remaining*lh+4);
+        let avail=bottom-y;
+
+        if(need<=avail){
+          drawLongSection(page,font,y,need,part?sec.label+' - تابع':sec.label,lines.slice(offset),tableFill,labelColor,labelSize);
+          y+=need; offset=lines.length; break;
+        }
+
+        if(avail<Math.max(18,lh+4)){
+          page=doc.addPage([A4W,A4H]); continuation=true;
+          drawReportPageFrame(page,font,logo,title,titleColor,true); y=55;
+          continue;
+        }
+
+        const maxLines=Math.max(1,Math.floor((avail-4)/lh));
+        const take=Math.min(remaining,maxLines);
+        const chunk=lines.slice(offset,offset+take);
+        const h=Math.min(avail,chunk.length*lh+4);
+        drawLongSection(page,font,y,h,part?sec.label+' - تابع':sec.label,chunk,tableFill,labelColor,labelSize);
+        offset+=take; part++;
+
+        if(offset<lines.length){
+          page=doc.addPage([A4W,A4H]); continuation=true;
+          drawReportPageFrame(page,font,logo,title,titleColor,true); y=55;
+        }else{
+          y+=h;
+        }
+      }
+    }
+    drawReportSignatures(page,font,d,deputy);
+  }
+
+  // استبدال إنشاء الـ PDF ليدعم عددًا غير محدود عمليًا من أسطر النص،
+  // مع إبقاء الشواهد 4 صور في كل صفحة وحتى 12 شاهدًا.
+  makePdfClient=async function(d){
+    if(!window.PDFLib||!window.fontkit)throw Error('تعذر تحميل محرك PDF. تحققي من الاتصال بالإنترنت ثم أعيدي المحاولة.');
+    const doc=await PDFLib.PDFDocument.create();
+    doc.registerFontkit(window.fontkit);
+    const fr=await fetch(PDF_FONT_URL,{mode:'cors',cache:'force-cache'});
+    if(!fr.ok)throw Error('تعذر تحميل خط المهند. أعيدي المحاولة.');
+    const font=await doc.embedFont(new Uint8Array(await fr.arrayBuffer()),{subset:false});
+    PDF_EN_FONT=await doc.embedFont(PDFLib.StandardFonts.Helvetica);
+    PDF_EN_BOLD=await doc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+    const logo=await doc.embedJpg(b64bytes(PDF_LOGO_B64));
+
+    drawReportPages(doc,font,logo,d);
+
+    const imgs=(d.images||[]).slice(0,12);
+    const evidencePages=Math.max(1,Math.ceil(imgs.length/4));
+    for(let i=0;i<evidencePages;i++){
+      const p=doc.addPage([A4W,A4H]);
+      await drawEvidence(p,font,logo,doc,{...d,images:imgs.slice(i*4,i*4+4),evidencePage:i+1,evidencePages});
+    }
+    doc.setTitle('تقرير تنفيذ '+selectedReportType());
+    doc.setCreator('مركز مصادر التعلم - متوسطة جميلة بنت عمر بن الخطاب');
+    return await doc.save();
+  };
+
 })();
