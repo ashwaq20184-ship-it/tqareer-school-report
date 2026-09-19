@@ -6,9 +6,20 @@
     none:null
   };
   const purple=[218,167,201]; // #DAA7C9
+  function toggleOtherReportType(){
+    const type=byId('reportType');
+    const wrap=byId('otherReportTypeWrap');
+    if(!type||!wrap)return;
+    wrap.style.display=type.value==='other'?'block':'none';
+  }
   function selectedReportType(){
     const el=byId('reportType');
-    return (el&&el.value)||'برنامج';
+    if(!el)return 'برنامج';
+    if(el.value==='other'){
+      const custom=String((byId('otherReportType')&&byId('otherReportType').value)||'').trim();
+      return custom||'أخرى';
+    }
+    return el.value||'برنامج';
   }
   function isPurpleSelected(){
     const el=byId('tableColor');
@@ -33,6 +44,8 @@
   try{
     const saved=JSON.parse(localStorage.getItem('schoolReport')||'{}');
     if(byId('reportType')&&saved.reportType)byId('reportType').value=saved.reportType;
+    if(byId('otherReportType')&&saved.otherReportType)byId('otherReportType').value=saved.otherReportType;
+    toggleOtherReportType();
     if(byId('deputyChoice')&&saved.deputyChoice)byId('deputyChoice').value=saved.deputyChoice;
     if(byId('tableColor')&&saved.tableColor)byId('tableColor').value=saved.tableColor;
   }catch(e){}
@@ -44,11 +57,16 @@
       try{
         const saved=JSON.parse(localStorage.getItem('schoolReport')||'{}');
         saved.reportType=byId('reportType').value;
+        saved.otherReportType=byId('otherReportType')?byId('otherReportType').value:'';
         saved.deputyChoice=byId('deputyChoice').value;
         saved.tableColor=byId('tableColor').value;
         localStorage.setItem('schoolReport',JSON.stringify(saved));
       }catch(e){}
     };
+  }
+  if(byId('reportType')){
+    byId('reportType').addEventListener('change',toggleOtherReportType);
+    toggleOtherReportType();
   }
   const clearBtn=byId('clearBtn');
   if(clearBtn){
@@ -60,6 +78,8 @@
         const cleared=baseIds.every(id=>!String(byId(id).value||'').trim())&&!localStorage.getItem('schoolReport');
         if(cleared){
           byId('reportType').value='برنامج';
+          if(byId('otherReportType'))byId('otherReportType').value='';
+          toggleOtherReportType();
           byId('deputyChoice').value='educational';
           byId('tableColor').value='current';
         }
