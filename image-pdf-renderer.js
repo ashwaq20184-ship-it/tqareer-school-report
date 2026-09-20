@@ -69,8 +69,8 @@
       .ipr-line{position:absolute;left:40px;right:40px;top:160px;border-top:2px solid #222}
       .ipr-title{position:absolute;left:58px;right:58px;top:185px;min-height:48px;text-align:center;font-size:27px;line-height:1.35;font-weight:700;color:${title}}
       .ipr-table{position:absolute;top:250px;left:40px;right:40px}
-      .ipr-table table{width:100%;border-collapse:collapse;table-layout:fixed;direction:rtl;font-size:18px}
-      .ipr-table th,.ipr-table td{border:2px solid #222;padding:10px 13px;vertical-align:middle;line-height:1.65}
+      .ipr-table table{width:100%;border-collapse:collapse;table-layout:fixed;direction:rtl;font-size:16px}
+      .ipr-table th,.ipr-table td{border:1px solid #222;padding:9px 12px;vertical-align:middle;line-height:1.6}
       .ipr-table th{background:${fill};color:${label};font-weight:700;text-align:center}
       .ipr-table td{background:#fff;color:#111;text-align:right;font-weight:500;white-space:normal;overflow-wrap:anywhere;word-break:normal}
       .ipr-table .ipr-meta th,.ipr-table .ipr-meta td{height:62px}
