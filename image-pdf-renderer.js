@@ -1,9 +1,14 @@
 (function(){
   'use strict';
 
+  const REFERENCE_W = 1447;
+  const REFERENCE_H = 2048;
   const CSS_W = 794;
-  const CSS_H = 1123;
-  const SCALE_300_DPI = 300 / 96;
+  const CSS_H = CSS_W * (REFERENCE_H / REFERENCE_W);
+  // Keep the final raster close to A4/300-DPI while preserving the reference aspect ratio.
+  const TARGET_RASTER_W = 2480;
+  const TARGET_RASTER_H = Math.round(TARGET_RASTER_W * (REFERENCE_H / REFERENCE_W));
+  const SCALE_300_DPI = TARGET_RASTER_W / CSS_W;
   const PDF_W = 595.28;
   const PDF_H = 841.89;
   const MAX_TABLE_BOTTOM = 815;
@@ -304,12 +309,22 @@
       useCORS:true,
       allowTaint:false,
       logging:false,
-      width:CSS_W,
-      height:CSS_H,
-      windowWidth:CSS_W,
-      windowHeight:CSS_H
+      width:Math.round(CSS_W),
+      height:Math.round(CSS_H),
+      windowWidth:Math.round(CSS_W),
+      windowHeight:Math.round(CSS_H)
     });
-    const dataUrl=canvas.toDataURL('image/jpeg',0.97);
+    let outCanvas=canvas;
+    if(canvas.width!==TARGET_RASTER_W || canvas.height!==TARGET_RASTER_H){
+      outCanvas=document.createElement('canvas');
+      outCanvas.width=TARGET_RASTER_W;
+      outCanvas.height=TARGET_RASTER_H;
+      const ctx=outCanvas.getContext('2d');
+      ctx.fillStyle='#fff';
+      ctx.fillRect(0,0,TARGET_RASTER_W,TARGET_RASTER_H);
+      ctx.drawImage(canvas,0,0,TARGET_RASTER_W,TARGET_RASTER_H);
+    }
+    const dataUrl=outCanvas.toDataURL('image/jpeg',0.97);
     return b64bytes(dataUrl.split(',')[1]);
   }
 
