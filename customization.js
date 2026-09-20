@@ -301,7 +301,7 @@
     drawReportPages(doc,font,logo,d);
 
     const imgs=(d.images||[]).slice(0,12);
-    const titles=(typeof evidenceTitles!=='undefined'?evidenceTitles:(d.evidenceTitles||[])).slice(0,12);
+    const titles=(d.evidenceTitles||[]).slice(0,12);
     const evidencePages=Math.max(1,Math.ceil(imgs.length/4));
     for(let i=0;i<evidencePages;i++){
       const p=doc.addPage([A4W,A4H]);
