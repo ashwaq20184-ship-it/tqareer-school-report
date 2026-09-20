@@ -65,33 +65,33 @@
       .ipr-page,.ipr-page *{box-sizing:border-box}
       .ipr-page{
         width:${CSS_W}px;height:${CSS_H}px;position:relative;overflow:hidden;background:#fff;color:#141414;
-        direction:rtl;font-family:"Tajawal",Tahoma,"Segoe UI",Arial,sans-serif;font-weight:500;
+        direction:rtl;font-family:"Tajawal",Tahoma,"Segoe UI",Arial,sans-serif;font-weight:400;
       }
       .ipr-top,.ipr-bottom{position:absolute;left:0;right:0;height:27px;background:linear-gradient(90deg,#138a8b,#23a576)}
       .ipr-top{top:0}.ipr-bottom{bottom:0}
       .ipr-logo{position:absolute;left:48px;top:43px;width:145px;height:auto;object-fit:contain}
-      .ipr-head{position:absolute;right:48px;top:41px;width:400px;text-align:right;font-size:17px;line-height:1.55;font-weight:700;color:#151515}
+      .ipr-head{position:absolute;right:48px;top:41px;width:400px;text-align:right;font-size:15px;line-height:1.55;font-weight:500;color:#151515}
       .ipr-line{position:absolute;left:40px;right:40px;top:160px;border-top:2px solid #222}
-      .ipr-title{position:absolute;left:58px;right:58px;top:185px;min-height:48px;text-align:center;font-size:27px;line-height:1.35;font-weight:700;color:${title}}
+      .ipr-title{position:absolute;left:58px;right:58px;top:185px;min-height:48px;text-align:center;font-size:23px;line-height:1.35;font-weight:700;color:${title}}
       .ipr-table{position:absolute;top:250px;left:40px;right:40px}
-      .ipr-table table{width:100%;border-collapse:collapse;table-layout:fixed;direction:rtl;font-size:16px}
-      .ipr-table th,.ipr-table td{border:1px solid #222;padding:9px 12px;vertical-align:middle;line-height:1.6}
-      .ipr-table th{background:${fill};color:${label};font-weight:700;text-align:center}
-      .ipr-table td{background:#fff;color:#111;text-align:right;font-weight:500;white-space:normal;overflow-wrap:anywhere;word-break:normal}
+      .ipr-table table{width:100%;border-collapse:collapse;table-layout:fixed;direction:rtl;font-size:14px}
+      .ipr-table th,.ipr-table td{border:1px solid #222;padding:8px 11px;vertical-align:middle;line-height:1.55}
+      .ipr-table th{background:${fill};color:${label};font-weight:600;text-align:center}
+      .ipr-table td{background:#fff;color:#111;text-align:right;font-weight:400;white-space:normal;overflow-wrap:anywhere;word-break:normal}
       .ipr-table .ipr-meta th,.ipr-table .ipr-meta td{height:62px}
       .ipr-table .ipr-long th{width:18%}
       .ipr-sign{position:absolute;left:42px;right:42px;bottom:70px;display:grid;gap:14px;text-align:center;direction:rtl}
       .ipr-sign.ipr-three{grid-template-columns:repeat(3,1fr)}
       .ipr-sign.ipr-two{grid-template-columns:repeat(2,1fr)}
-      .ipr-sign-label{font-size:18px;color:#a61919;font-weight:700;margin-bottom:8px}
-      .ipr-sign-name{font-size:18px;color:#141414;font-weight:700}
-      .ipr-e-title{position:absolute;left:55px;right:55px;top:184px;text-align:center;font-size:27px;font-weight:700;color:${title}}
-      .ipr-e-sub{position:absolute;left:60px;right:60px;top:224px;text-align:center;font-size:17px;line-height:1.5;color:#555;font-weight:600}
+      .ipr-sign-label{font-size:15px;color:#a61919;font-weight:600;margin-bottom:7px}
+      .ipr-sign-name{font-size:15px;color:#141414;font-weight:500}
+      .ipr-e-title{position:absolute;left:55px;right:55px;top:184px;text-align:center;font-size:23px;font-weight:700;color:${title}}
+      .ipr-e-sub{position:absolute;left:60px;right:60px;top:224px;text-align:center;font-size:14px;line-height:1.5;color:#555;font-weight:500}
       .ipr-grid{position:absolute;top:268px;left:45px;right:45px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
       .ipr-card{height:300px;border:2px solid #bbb;padding:9px;background:#fff;display:flex;flex-direction:column;overflow:hidden}
       .ipr-card img{display:block;width:100%;height:250px;object-fit:contain;background:#fff}
       .ipr-card.ipr-cap img{height:220px}
-      .ipr-caption{border-top:1px solid #ddd;margin-top:7px;padding-top:6px;text-align:center;font-size:16px;line-height:1.4;font-weight:700;color:#222}
+      .ipr-caption{border-top:1px solid #ddd;margin-top:7px;padding-top:6px;text-align:center;font-size:13px;line-height:1.4;font-weight:500;color:#222}
       .ipr-e-signline{position:absolute;left:45px;right:45px;bottom:69px;border-top:1px solid #d0d0d0;padding-top:13px}
     `;
   }
