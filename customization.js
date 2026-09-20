@@ -36,7 +36,7 @@
     const value=(el&&el.value)||'educational';
     if(value==='other'){
       const name=String((byId('otherDeputyName')&&byId('otherDeputyName').value)||'').trim();
-      return {label:'الوكيلة',name:name||'—'};
+      return {label:'',name:name||'—'};
     }
     return deputyMap[value]||null;
   }
