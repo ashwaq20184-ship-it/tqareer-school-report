@@ -71,12 +71,13 @@
     if(cur)out.push({type:type||'en',text:cur});
     return out;
   }
-  function arPrepared(doc,text){
-    return typeof doc.processArabic==='function'?doc.processArabic(String(text??'')):String(text??'');
+  function arForWidth(doc,text){
+    const raw=String(text??'');
+    return typeof doc.processArabic==='function'?doc.processArabic(raw):raw;
   }
   function runWidth(doc,run,size){
     setFont(doc,run.type,size);
-    const t=run.type==='ar'?arPrepared(doc,run.text):run.text;
+    const t=run.type==='ar'?arForWidth(doc,run.text):run.text;
     return doc.getTextWidth(t);
   }
   function textWidthJ(doc,text,size){
@@ -106,7 +107,9 @@
       const r=runs[i],rw=widths[i];
       if(r.type==='ar'){
         setFont(doc,'ar',size);
-        doc.text(arPrepared(doc,r.text),cursor,baseline,{align:'right',R2L:true,baseline:'alphabetic'});
+        // نرسل النص العربي بصورته الأصلية. jsPDF يشكّله تلقائيًا عبر Arabic plugin،
+        // ثم R2L يعكس اتجاه العرض مرة واحدة فقط. معالجة النص يدويًا هنا كانت تسبب قلبه كأنه في مرآة.
+        doc.text(r.text,cursor,baseline,{align:'right',R2L:true,baseline:'alphabetic'});
       }else{
         setFont(doc,'en',size);
         doc.text(r.text,cursor-rw,baseline,{align:'left',baseline:'alphabetic'});
