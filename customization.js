@@ -136,8 +136,12 @@
     drawTextTop(page,font,10,213,190,'معدة التقرير',13.5,C.red,'right');
     drawTextTop(page,font,10,220,190,d.preparer||'—',13.5,C.dark,'right');
     if(deputy){
-      drawTextTop(page,font,105,237,95,deputy.label,13.5,C.red,'right');
-      drawTextTop(page,font,105,245,95,deputy.name,13.5,C.dark,'right');
+      if(deputy.label){
+        drawTextTop(page,font,105,237,95,deputy.label,13.5,C.red,'right');
+        drawTextTop(page,font,105,245,95,deputy.name,13.5,C.dark,'right');
+      }else{
+        drawTextTop(page,font,105,241,95,deputy.name,13.5,C.dark,'right');
+      }
     }
     drawTextTop(page,font,10,237,95,'مديرة المدرسة',13.5,C.red,'right');
     drawTextTop(page,font,10,245,95,'حنان الغامدي',13.5,C.dark,'right');
@@ -176,8 +180,12 @@
     ];
     if(deputy)blocks.splice(1,0,[73.4,63.3,deputy.label,deputy.name]);
     for(const [x,w,l,v] of blocks){
-      drawTextTop(page,font,x,237,w,l,12.5,C.red,'center');
-      drawTextTop(page,font,x,246,w,v,12.5,C.dark,'center');
+      if(l){
+        drawTextTop(page,font,x,237,w,l,12.5,C.red,'center');
+        drawTextTop(page,font,x,246,w,v,12.5,C.dark,'center');
+      }else{
+        drawTextTop(page,font,x,242,w,v,12.5,C.dark,'center');
+      }
     }
     bar(page,290);
   };
