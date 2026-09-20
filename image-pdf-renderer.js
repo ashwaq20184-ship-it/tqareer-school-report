@@ -65,7 +65,7 @@
     if(v === 'student') return {label:'وكيلة الشؤون الطلابية', name:'زكية الرفاعي'};
     if(v === 'other'){
       const name=String(($id('otherDeputyName')&&$id('otherDeputyName').value)||'').trim();
-      return {label:'الوكيلة',name:name||'—'};
+      return {label:'',name:name||'—'};
     }
     if(v === 'none') return null;
     return {label:'وكيلة الشؤون التعليمية', name:'تهاني شبكشي'};
