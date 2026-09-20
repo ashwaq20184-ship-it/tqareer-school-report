@@ -25,9 +25,20 @@
     const el=byId('tableColor');
     return !!(el&&el.value==='purple');
   }
+  function toggleOtherDeputy(){
+    const choice=byId('deputyChoice');
+    const wrap=byId('otherDeputyWrap');
+    if(!choice||!wrap)return;
+    wrap.style.display=choice.value==='other'?'block':'none';
+  }
   function selectedDeputy(){
     const el=byId('deputyChoice');
-    return deputyMap[(el&&el.value)||'educational']||null;
+    const value=(el&&el.value)||'educational';
+    if(value==='other'){
+      const name=String((byId('otherDeputyName')&&byId('otherDeputyName').value)||'').trim();
+      return {label:'الوكيلة',name:name||'—'};
+    }
+    return deputyMap[value]||null;
   }
   function selectedTableFill(){
     return isPurpleSelected()?purple:C.gray;
@@ -47,6 +58,8 @@
     if(byId('otherReportType')&&saved.otherReportType)byId('otherReportType').value=saved.otherReportType;
     toggleOtherReportType();
     if(byId('deputyChoice')&&saved.deputyChoice)byId('deputyChoice').value=saved.deputyChoice;
+    if(byId('otherDeputyName')&&saved.otherDeputyName)byId('otherDeputyName').value=saved.otherDeputyName;
+    toggleOtherDeputy();
     if(byId('tableColor')&&saved.tableColor)byId('tableColor').value=saved.tableColor;
   }catch(e){}
   const saveBtn=byId('saveBtn');
@@ -59,6 +72,7 @@
         saved.reportType=byId('reportType').value;
         saved.otherReportType=byId('otherReportType')?byId('otherReportType').value:'';
         saved.deputyChoice=byId('deputyChoice').value;
+        saved.otherDeputyName=byId('otherDeputyName')?byId('otherDeputyName').value:'';
         saved.tableColor=byId('tableColor').value;
         localStorage.setItem('schoolReport',JSON.stringify(saved));
       }catch(e){}
@@ -67,6 +81,10 @@
   if(byId('reportType')){
     byId('reportType').addEventListener('change',toggleOtherReportType);
     toggleOtherReportType();
+  }
+  if(byId('deputyChoice')){
+    byId('deputyChoice').addEventListener('change',toggleOtherDeputy);
+    toggleOtherDeputy();
   }
   const clearBtn=byId('clearBtn');
   if(clearBtn){
@@ -81,6 +99,8 @@
           if(byId('otherReportType'))byId('otherReportType').value='';
           toggleOtherReportType();
           byId('deputyChoice').value='educational';
+          if(byId('otherDeputyName'))byId('otherDeputyName').value='';
+          toggleOtherDeputy();
           byId('tableColor').value='current';
         }
       }catch(e){}
