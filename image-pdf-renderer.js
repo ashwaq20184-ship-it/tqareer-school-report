@@ -63,6 +63,10 @@
   function selectedDeputyImage(){
     const v = ($id('deputyChoice') && $id('deputyChoice').value) || 'educational';
     if(v === 'student') return {label:'وكيلة الشؤون الطلابية', name:'زكية الرفاعي'};
+    if(v === 'other'){
+      const name=String(($id('otherDeputyName')&&$id('otherDeputyName').value)||'').trim();
+      return {label:'الوكيلة',name:name||'—'};
+    }
     if(v === 'none') return null;
     return {label:'وكيلة الشؤون التعليمية', name:'تهاني شبكشي'};
   }
@@ -103,7 +107,7 @@
       .ipr-top,.ipr-bottom{position:absolute;left:0;right:0;height:27px;background:linear-gradient(90deg,#138a8b,#23a576)}
       .ipr-top{top:0}.ipr-bottom{bottom:0}
       .ipr-logo{position:absolute;left:48px;top:43px;width:145px;height:auto;object-fit:contain}
-      .ipr-head{position:absolute;right:48px;top:41px;width:400px;text-align:right;font-size:15px;line-height:1.55;font-weight:500;color:#151515}
+      .ipr-head{position:absolute;right:48px;top:36px;width:420px;text-align:right;font-size:14px;line-height:1.45;font-weight:500;color:#151515}
       .ipr-line{position:absolute;left:40px;right:40px;top:160px;border-top:2px solid #222}
       .ipr-title{position:absolute;left:58px;right:58px;top:185px;min-height:48px;text-align:center;font-size:23px;line-height:1.35;font-weight:700;color:${title}}
       .ipr-table{position:absolute;top:250px;left:40px;right:40px}
@@ -141,7 +145,8 @@
         المملكة العربية السعودية<br>
         وزارة التعليم<br>
         الإدارة العامة للتعليم بمنطقة المدينة المنورة<br>
-        متوسطة جميلة بنت عمر بن الخطاب
+        متوسطة جميلة بنت عمر بن الخطاب بينبع البحر<br>
+        المتوسطة الأولى لتعليم الكبيرات
       </div>
       <div class="ipr-line"></div>
       <div class="ipr-title">${esc(continuationTitle)}</div>
@@ -297,7 +302,8 @@
           المملكة العربية السعودية<br>
           وزارة التعليم<br>
           الإدارة العامة للتعليم بمنطقة المدينة المنورة<br>
-          متوسطة جميلة بنت عمر بن الخطاب
+          متوسطة جميلة بنت عمر بن الخطاب بينبع البحر<br>
+        المتوسطة الأولى لتعليم الكبيرات
         </div>
         <div class="ipr-line"></div>
         <div class="ipr-e-title">شواهد تنفيذ ${esc(type)}</div>
@@ -397,7 +403,8 @@
       }
 
       doc.setTitle('تقرير تنفيذ '+selectedReportTypeImage());
-      doc.setCreator('مركز مصادر التعلم - متوسطة جميلة بنت عمر بن الخطاب');
+      doc.setCreator('مركز مصادر التعلم - متوسطة جميلة بنت عمر بن الخطاب بينبع البحر<br>
+        المتوسطة الأولى لتعليم الكبيرات');
       doc.setProducer('Browser image renderer - 300 DPI');
       return await doc.save();
     } finally {
