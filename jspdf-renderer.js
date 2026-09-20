@@ -1,5 +1,24 @@
 (function(){
   const legacyMakePdfClient=typeof makePdfClient==='function'?makePdfClient:null;
+  const byId=id=>document.getElementById(id);
+  const deputyMap={
+    educational:{label:'وكيلة الشؤون التعليمية',name:'تهاني شبكشي'},
+    student:{label:'وكيلة الشؤون الطلابية',name:'زكية الرفاعي'},
+    none:null
+  };
+  function selectedReportType(){
+    const el=byId('reportType');
+    if(!el)return 'برنامج';
+    if(el.value==='other'){
+      const custom=String((byId('otherReportType')&&byId('otherReportType').value)||'').trim();
+      return custom||'أخرى';
+    }
+    return el.value||'برنامج';
+  }
+  function selectedDeputy(){
+    const el=byId('deputyChoice');
+    return deputyMap[(el&&el.value)||'educational']||null;
+  }
   const FONT_URL='https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoNaskhArabic/hinted/ttf/NotoNaskhArabic-Bold.ttf';
   const FONT_FILE='NotoNaskhArabic-Bold.ttf';
   const AR_FONT='NotoNaskhArabic';
