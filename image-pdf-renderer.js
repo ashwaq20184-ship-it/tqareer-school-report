@@ -14,7 +14,7 @@
   const MAX_TABLE_BOTTOM = 815;
 
   const $id = id => document.getElementById(id);
-  const HQ_LOGO_SRC = window.MOE_LOGO_HQ_DATA || ('data:image/jpeg;base64,'+PDF_LOGO_B64);
+  const HQ_LOGO_SRC = 'moe-logo.svg?v=20260920-1';
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[ch]);
