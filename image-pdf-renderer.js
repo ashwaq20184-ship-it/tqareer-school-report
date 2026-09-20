@@ -60,7 +60,7 @@
       .ipr-page,.ipr-page *{box-sizing:border-box}
       .ipr-page{
         width:${CSS_W}px;height:${CSS_H}px;position:relative;overflow:hidden;background:#fff;color:#141414;
-        direction:rtl;font-family:Tahoma,"Segoe UI",Arial,sans-serif;font-weight:400;
+        direction:rtl;font-family:"Tajawal",Tahoma,"Segoe UI",Arial,sans-serif;font-weight:500;
       }
       .ipr-top,.ipr-bottom{position:absolute;left:0;right:0;height:27px;background:linear-gradient(90deg,#138a8b,#23a576)}
       .ipr-top{top:0}.ipr-bottom{bottom:0}
@@ -327,7 +327,16 @@
       const evidencePages=buildEvidencePages(root,d);
       const pages=[...reportPages,...evidencePages];
       await waitForImages(root);
-      if(document.fonts && document.fonts.ready) await document.fonts.ready;
+      if(document.fonts){
+        try{
+          await Promise.all([
+            document.fonts.load('400 16px Tajawal'),
+            document.fonts.load('500 16px Tajawal'),
+            document.fonts.load('700 16px Tajawal')
+          ]);
+        }catch(e){}
+        if(document.fonts.ready) await document.fonts.ready;
+      }
 
       const doc=await PDFLib.PDFDocument.create();
       for(let i=0;i<pages.length;i++){
