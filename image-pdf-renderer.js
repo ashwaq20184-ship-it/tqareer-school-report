@@ -14,6 +14,7 @@
   const MAX_TABLE_BOTTOM = 815;
 
   const $id = id => document.getElementById(id);
+  const HQ_LOGO_SRC = window.MOE_LOGO_HQ_DATA || ('data:image/jpeg;base64,'+PDF_LOGO_B64);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[ch]);
@@ -103,7 +104,7 @@
     page.innerHTML=`
       <style>${rendererCss()}</style>
       <div class="ipr-top"></div>
-      <img class="ipr-logo" alt="وزارة التعليم" src="data:image/jpeg;base64,${PDF_LOGO_B64}">
+      <img class="ipr-logo" alt="وزارة التعليم" src="${HQ_LOGO_SRC}">
       <div class="ipr-head">
         المملكة العربية السعودية<br>
         وزارة التعليم<br>
@@ -259,7 +260,7 @@
       page.innerHTML=`
         <style>${rendererCss()}</style>
         <div class="ipr-top"></div>
-        <img class="ipr-logo" alt="وزارة التعليم" src="data:image/jpeg;base64,${PDF_LOGO_B64}">
+        <img class="ipr-logo" alt="وزارة التعليم" src="${HQ_LOGO_SRC}">
         <div class="ipr-head">
           المملكة العربية السعودية<br>
           وزارة التعليم<br>
