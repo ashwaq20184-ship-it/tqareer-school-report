@@ -14,10 +14,42 @@
   const MAX_TABLE_BOTTOM = 815;
 
   const $id = id => document.getElementById(id);
-  const HQ_LOGO_SRC = 'moe-logo.svg?v=20260920-1';
+  let HQ_LOGO_SRC = 'moe-logo.svg?v=20260920-1';
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[ch]);
+
+  async function prepareHqLogoSource(){
+    try{
+      const r=await fetch('moe-logo.svg?v=20260920-1',{cache:'force-cache'});
+      if(!r.ok) throw new Error('logo fetch failed');
+      const svgText=await r.text();
+      const blob=new Blob([svgText],{type:'image/svg+xml;charset=utf-8'});
+      const url=URL.createObjectURL(blob);
+      try{
+        const img=await new Promise((resolve,reject)=>{
+          const im=new Image();
+          im.onload=()=>resolve(im);
+          im.onerror=()=>reject(new Error('logo decode failed'));
+          im.src=url;
+        });
+        const targetW=1600;
+        const ratio=(img.naturalHeight&&img.naturalWidth)?(img.naturalHeight/img.naturalWidth):(411.1/540.9);
+        const targetH=Math.max(1,Math.round(targetW*ratio));
+        const canvas=document.createElement('canvas');
+        canvas.width=targetW;
+        canvas.height=targetH;
+        const ctx=canvas.getContext('2d');
+        ctx.clearRect(0,0,targetW,targetH);
+        ctx.drawImage(img,0,0,targetW,targetH);
+        HQ_LOGO_SRC=canvas.toDataURL('image/png');
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }catch(e){
+      HQ_LOGO_SRC='data:image/jpeg;base64,'+PDF_LOGO_B64;
+    }
+  }
 
   function selectedReportTypeImage(){
     const el = $id('reportType');
@@ -332,6 +364,7 @@
   async function makeImagePdfClient(d){
     if(!window.PDFLib) throw new Error('تعذر تحميل محرك PDF. تحققي من الاتصال بالإنترنت ثم أعيدي المحاولة.');
     await ensureHtml2Canvas();
+    await prepareHqLogoSource();
 
     const root=document.createElement('div');
     root.setAttribute('aria-hidden','true');
