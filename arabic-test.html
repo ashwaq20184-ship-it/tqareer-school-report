@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>اختبار العربية - PDFKit</title>
+<style>
+body{margin:0;background:#f4f7f8;color:#17202a;font-family:Tahoma,Arial,sans-serif}
+.wrap{max-width:900px;margin:auto;padding:18px}
+.card{background:#fff;border:1px solid #d8e0e4;border-radius:16px;padding:18px;margin:14px 0}
+h1{color:#315a91;margin-top:0}
+textarea{width:100%;min-height:150px;box-sizing:border-box;border:1px solid #cfd8dd;border-radius:10px;padding:12px;font:17px/1.8 Tahoma,Arial,sans-serif;direction:rtl}
+button{border:0;border-radius:10px;padding:12px 18px;background:#138a8b;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+button:disabled{opacity:.55}
+#status{margin-top:10px;padding:10px 12px;border-radius:9px;background:#eef6f6;display:none}
+iframe{width:100%;height:720px;border:1px solid #d8e0e4;border-radius:12px;background:#fff}
+.note{color:#66737a;line-height:1.8}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="card">
+    <h1>اختبار محرك العربية الجديد</h1>
+    <p class="note">هذه صفحة اختبار منفصلة ولا تغيّر منشئ التقارير الأساسي. الهدف التأكد بصريًا من الياء واللام ألف واتجاه العربية قبل نقل المحرك للموقع.</p>
+    <textarea id="sample">المخرجات وقياس الأثر
+
+إكمال التحديات ونسب الاجتياز وتحسن دقة الإجابات، إلى جانب التقويم الصفي للتحقق من انعكاس المشاركة على أداء الطالبات.
+
+اختبار الحروف: في، على، لديّ، ي، لا، لأ، لإ، لآ.
+Mixed test: English 123 مع العربية سنة 1448 هـ.</textarea>
+    <div style="margin-top:12px"><button id="make">إنشاء معاينة PDF</button></div>
+    <div id="status"></div>
+  </section>
+  <section class="card">
+    <iframe id="preview" title="معاينة PDF"></iframe>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/pdfkit@0.17.2/js/pdfkit.standalone.js"></script>
+<script type="module">
+import { textBidi } from 'https://cdn.jsdelivr.net/npm/bidi-shaper@0.1.2/dist/adapters/pdfkit.js';
+
+const FONT_URL='https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoNaskhArabic/hinted/ttf/NotoNaskhArabic-Bold.ttf';
+const $=id=>document.getElementById(id);
+let fontBytes=null, currentUrl=null;
+
+function show(msg){
+  $('status').textContent=msg;
+  $('status').style.display='block';
+}
+async function getFont(){
+  if(fontBytes)return fontBytes;
+  const r=await fetch(FONT_URL,{mode:'cors',cache:'force-cache'});
+  if(!r.ok)throw new Error('تعذر تحميل الخط العربي.');
+  fontBytes=new Uint8Array(await r.arrayBuffer());
+  return fontBytes;
+}
+function wrapLogical(doc,text,maxWidth,size){
+  doc.font('Noto').fontSize(size);
+  const out=[];
+  for(const paragraph of String(text||'').split('\n')){
+    if(!paragraph.trim()){out.push('');continue}
+    const words=paragraph.trim().split(/\s+/);
+    let line='';
+    for(const word of words){
+      const test=line?line+' '+word:word;
+      if(doc.widthOfString(test)<=maxWidth){line=test;continue}
+      if(line)out.push(line);
+      line=word;
+    }
+    if(line)out.push(line);
+  }
+  return out;
+}
+function rtlLine(doc,text,x,y,width,size,color='#111'){
+  doc.font('Noto').fontSize(size).fillColor(color);
+  textBidi(doc,text,x,y,{width,align:'right',lineBreak:false,bidi:{direction:'rtl'}});
+}
+function centeredRtl(doc,text,x,y,width,size,color='#315a91'){
+  doc.font('Noto').fontSize(size).fillColor(color);
+  textBidi(doc,text,x,y,{width,align:'center',lineBreak:false,bidi:{direction:'rtl'}});
+}
+
+$('make').addEventListener('click',async()=>{
+  const btn=$('make');
+  btn.disabled=true;
+  show('جارٍ إنشاء ملف الاختبار...');
+  try{
+    const font=await getFont();
+    const doc=new PDFDocument({size:'A4',margin:0,autoFirstPage:true,compress:true});
+    doc.registerFont('Noto',font);
+    doc.font('Noto');
+
+    const chunks=[];
+    doc.on('data',c=>chunks.push(c));
+    const ended=new Promise((resolve,reject)=>{
+      doc.on('end',resolve);
+      doc.on('error',reject);
+    });
+
+    const W=595.28;
+    doc.rect(0,0,W,20).fill('#138a8b');
+    centeredRtl(doc,'اختبار عرض النص العربي',60,40,W-120,20,'#315a91');
+
+    const x=55, y=105, totalW=485, labelW=130, valueW=355, boxH=430;
+    doc.lineWidth(.8).strokeColor('#333');
+    doc.rect(x,y,totalW,boxH).stroke();
+    doc.fillColor('#e7e7e7').rect(x+valueW,y,labelW,boxH).fill();
+    doc.strokeColor('#333').rect(x+valueW,y,labelW,boxH).stroke();
+
+    doc.font('Noto').fontSize(15).fillColor('#315a91');
+    textBidi(doc,'المخرجات وقياس الأثر',x+valueW+10,y+175,{width:labelW-20,align:'center',bidi:{direction:'rtl'}});
+
+    const text=$('sample').value;
+    const lines=wrapLogical(doc,text,valueW-24,15);
+    let yy=y+18;
+    for(const line of lines){
+      if(yy>y+boxH-28)break;
+      if(line===''){yy+=14;continue}
+      rtlLine(doc,line,x+12,yy,valueW-24,15,'#111');
+      yy+=25;
+    }
+
+    doc.font('Noto').fontSize(14).fillColor('#7f1d1d');
+    textBidi(doc,'لا  لأ  لإ  لآ  —  في  على  لديّ  ي',x+12,y+boxH-35,{width:valueW-24,align:'right',lineBreak:false,bidi:{direction:'rtl'}});
+
+    doc.end();
+    await ended;
+
+    const blob=new Blob(chunks,{type:'application/pdf'});
+    if(currentUrl)URL.revokeObjectURL(currentUrl);
+    currentUrl=URL.createObjectURL(blob);
+    $('preview').src=currentUrl;
+    show('تم إنشاء المعاينة. افحصي خصوصًا: الياء، لا/لأ/لإ/لآ، وترتيب الجملة من اليمين إلى اليسار.');
+  }catch(e){
+    console.error(e);
+    show(e.message||'تعذر إنشاء ملف الاختبار.');
+  }finally{
+    btn.disabled=false;
+  }
+});
+</script>
+</body>
+</html>
