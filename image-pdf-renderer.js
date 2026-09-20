@@ -403,8 +403,7 @@
       }
 
       doc.setTitle('تقرير تنفيذ '+selectedReportTypeImage());
-      doc.setCreator('مركز مصادر التعلم - متوسطة جميلة بنت عمر بن الخطاب بينبع البحر<br>
-        المتوسطة الأولى لتعليم الكبيرات');
+      doc.setCreator('مركز مصادر التعلم - متوسطة جميلة بنت عمر بن الخطاب بينبع البحر / المتوسطة الأولى لتعليم الكبيرات');
       doc.setProducer('Browser image renderer - 300 DPI');
       return await doc.save();
     } finally {
