@@ -184,7 +184,9 @@
     const wrap=document.createElement('div');
     wrap.className='ipr-sign '+(deputy?'ipr-three':'ipr-two');
     let html=`<div><div class="ipr-sign-label">معدة التقرير</div><div class="ipr-sign-name">${esc(d.preparer||'—')}</div></div>`;
-    if(deputy) html+=`<div><div class="ipr-sign-label">${esc(deputy.label)}</div><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`;
+    if(deputy) html+=deputy.label
+      ?`<div><div class="ipr-sign-label">${esc(deputy.label)}</div><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`
+      :`<div style="display:flex;align-items:center;justify-content:center"><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`;
     html+=`<div><div class="ipr-sign-label">مديرة المدرسة</div><div class="ipr-sign-name">حنان الغامدي</div></div>`;
     wrap.innerHTML=html;
     page.appendChild(wrap);
@@ -319,7 +321,9 @@
       wrap.className='ipr-sign '+(deputy?'ipr-three':'ipr-two');
       wrap.style.position='static';
       let sign=`<div><div class="ipr-sign-label">معدة التقرير</div><div class="ipr-sign-name">${esc(d.preparer||'—')}</div></div>`;
-      if(deputy) sign+=`<div><div class="ipr-sign-label">${esc(deputy.label)}</div><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`;
+      if(deputy) sign+=deputy.label
+        ?`<div><div class="ipr-sign-label">${esc(deputy.label)}</div><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`
+        :`<div style="display:flex;align-items:center;justify-content:center"><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`;
       sign+=`<div><div class="ipr-sign-label">مديرة المدرسة</div><div class="ipr-sign-name">حنان الغامدي</div></div>`;
       wrap.innerHTML=sign;
       line.appendChild(wrap);
