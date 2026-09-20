@@ -163,7 +163,7 @@
   };
 
   // معالجة النصوص الطويلة: لا يتم قصها، بل تتمدد تلقائيًا إلى صفحات تقرير إضافية.
-  function reportLineHeight(size){return Math.max(4.9,(size*1.22)/MM)}
+  function reportLineHeight(size){return Math.max(5.6,(size*1.42)/MM)}
   function wrapAllReportText(font,text,widthMm,size){
     const t=String(text??'').trim();
     if(!t)return [''];
