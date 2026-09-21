@@ -117,10 +117,6 @@ function renderPhotos(){
   }
 }
 renderPhotos();
-const COUNTER_URL='https://ebsrurheeqyiexcfcehx.supabase.co',COUNTER_KEY='sb_publishable_iBthlnseptMOOcKGPE5nbQ_PlsDvaml';
-async function refreshCounter(){try{const r=await fetch(COUNTER_URL+'/rest/v1/report_page_counter?select=total&id=eq.1',{headers:{apikey:COUNTER_KEY}}),d=await r.json();if(d&&d[0])$('reportCounter').textContent=Number(d[0].total).toLocaleString('ar-SA')}catch(e){if($('reportCounter').textContent==='—')$('reportCounter').textContent='غير متاح'}}
-async function incrementCounter(){try{const r=await fetch(COUNTER_URL+'/rest/v1/rpc/increment_report_page_counter',{method:'POST',headers:{apikey:COUNTER_KEY,'Content-Type':'application/json'},body:'{}'}),n=await r.json();if(n!=null)$('reportCounter').textContent=Number(n).toLocaleString('ar-SA')}catch(e){}}
-refreshCounter();setInterval(refreshCounter,30000);
 $('saveBtn').onclick=()=>{const o={};ids.forEach(id=>o[id]=$(id).value);o.hYear=$('hYear').value;o.hMonth=$('hMonth').value;o.hDay=$('hDay').value;o.evidenceTitles=evidenceTitles;localStorage.setItem('schoolReport',JSON.stringify(o));show('تم حفظ البيانات على هذا الجهاز.')};
 function load(){try{const o=JSON.parse(localStorage.getItem('schoolReport')||'{}');ids.forEach(id=>{if(o[id])$(id).value=o[id]});if(o.hYear)fillYears(o.hYear);if(o.hMonth)fillMonths(o.hMonth);if(Array.isArray(o.evidenceTitles))evidenceTitles=o.evidenceTitles.slice(0,12).concat(Array(12).fill('')).slice(0,12);fillDays(o.hDay);updateDate();renderPhotos()}catch(e){}}load();
 $('clearBtn').onclick=()=>{if(!confirm('هل تريدين مسح جميع الحقول؟'))return;ids.forEach(id=>$(id).value='');evidenceImages=[];evidenceTitles=Array(12).fill('');renderPhotos();localStorage.removeItem('schoolReport');show('تم مسح الحقول.')};
