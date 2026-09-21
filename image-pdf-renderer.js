@@ -85,6 +85,13 @@
     if(v === 'none'){
       return [manager];
     }
+    if(v === 'other'){
+      const custom=String(($id('otherDeputyName')&&$id('otherDeputyName').value)||'').trim();
+      return [
+        {label:'',name:custom||'—'},
+        manager
+      ];
+    }
     return [
       {label:'وكيلة الشؤون التعليمية',name:'تهاني شبكشي'},
       manager
@@ -94,9 +101,12 @@
   function approvalTailHtml(d){
     const approvals=selectedApprovalEntitiesImage();
     const cols=approvals.length===3?'ipr-approval-three':approvals.length===2?'ipr-approval-two':'ipr-approval-empty';
-    const approvalHtml=approvals.map(item=>`
+    const approvalHtml=approvals.map(item=>item.label?`
       <div>
         <div class="ipr-sign-label">${esc(item.label)}</div>
+        <div class="ipr-sign-name">${esc(item.name)}</div>
+      </div>`:`
+      <div class="ipr-custom-approval">
         <div class="ipr-sign-name">${esc(item.name)}</div>
       </div>`).join('');
     return `
@@ -168,6 +178,7 @@
       .ipr-approval-row{display:grid;gap:14px;text-align:center;direction:rtl}
       .ipr-approval-row.ipr-approval-two{grid-template-columns:repeat(2,1fr)}
       .ipr-approval-row.ipr-approval-three{grid-template-columns:repeat(3,1fr)}
+      .ipr-custom-approval{display:flex;align-items:center;justify-content:center;min-height:42px}
       .ipr-approval-row.ipr-approval-empty{display:block;min-height:58px}
       .ipr-e-signline .ipr-sign{position:static;left:auto;right:auto;top:auto;bottom:auto;width:100%;display:block}
       .ipr-sign-label{font-size:15px;color:#a61919;font-weight:600;margin-bottom:7px}
