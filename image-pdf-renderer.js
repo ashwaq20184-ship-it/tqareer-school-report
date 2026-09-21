@@ -83,7 +83,7 @@
       ];
     }
     if(v === 'none'){
-      return [];
+      return [manager];
     }
     return [
       {label:'وكيلة الشؤون التعليمية',name:'تهاني شبكشي'},
