@@ -11,7 +11,8 @@
   const SCALE_300_DPI = TARGET_RASTER_W / CSS_W;
   const PDF_W = 595.28;
   const PDF_H = 841.89;
-  const MAX_TABLE_BOTTOM = 815;
+  const SIGNATURE_SAFE_GAP = 165;
+  const MAX_TABLE_BOTTOM = Math.round(CSS_H - SIGNATURE_SAFE_GAP);
 
   const $id = id => document.getElementById(id);
   let HQ_LOGO_SRC = 'moe-logo.svg?v=20260920-1';
@@ -117,6 +118,7 @@
       .ipr-table td{background:#fff;color:#111;text-align:right;font-weight:400;white-space:normal;overflow-wrap:anywhere;word-break:normal}
       .ipr-table .ipr-meta th,.ipr-table .ipr-meta td{height:62px}
       .ipr-table .ipr-long th{width:18%}
+      .ipr-table .ipr-long.ipr-tight th,.ipr-table .ipr-long.ipr-tight td{padding:6px 9px;line-height:1.42;font-size:13px}
       .ipr-sign{position:absolute;left:42px;right:42px;bottom:70px;display:grid;gap:14px;text-align:center;direction:rtl}
       .ipr-sign.ipr-three{grid-template-columns:repeat(3,1fr)}
       .ipr-sign.ipr-two{grid-template-columns:repeat(2,1fr)}
@@ -171,9 +173,9 @@
     tbody.appendChild(tr2);
   }
 
-  function addLongRow(page,label,text){
+  function addLongRow(page,label,text,compact=false){
     const tr=document.createElement('tr');
-    tr.className='ipr-long';
+    tr.className='ipr-long'+(compact?' ipr-tight':'');
     tr.innerHTML=`<th>${esc(label)}</th><td colspan="3">${esc(text).replace(/\n/g,'<br>')}</td>`;
     page.querySelector('tbody').appendChild(tr);
     return tr;
@@ -214,6 +216,21 @@
     return {chunk:words.slice(0,best).join(' '),rest:words.slice(best).join(' ')};
   }
 
+  function tryWholeRow(page,label,text){
+    const normal=addLongRow(page,label,text);
+    if(tableBottom(page)<=MAX_TABLE_BOTTOM) return normal;
+
+    // إذا تجاوز النص المساحة بفارق بسيط، نضغط هذا الصف وحده بدل إنشاء صفحة جديدة لسطر أو سطرين.
+    const overflow=tableBottom(page)-MAX_TABLE_BOTTOM;
+    normal.remove();
+    if(overflow<=75){
+      const compact=addLongRow(page,label,text,true);
+      if(tableBottom(page)<=MAX_TABLE_BOTTOM) return compact;
+      compact.remove();
+    }
+    return null;
+  }
+
   function buildReportPages(root,d){
     const type=selectedReportTypeImage();
     const baseTitle='تقرير تنفيذ '+type+' '+(d.program||'........................');
@@ -232,9 +249,7 @@
       let rest=section.text.trim();
       let continued=false;
       if(!rest){
-        const row=addLongRow(page,section.label,'');
-        if(tableBottom(page)>MAX_TABLE_BOTTOM){
-          row.remove();
+        if(!tryWholeRow(page,section.label,'')){
           page=pageShell('متابعة '+baseTitle);
           root.appendChild(page);pages.push(page);
           addLongRow(page,section.label,'');
@@ -243,16 +258,17 @@
       }
 
       while(rest){
-        const test=addLongRow(page,continued?section.label+' - تابع':section.label,rest);
-        if(tableBottom(page)<=MAX_TABLE_BOTTOM){
+        const rowLabel=continued?section.label+' - تابع':section.label;
+
+        // الأولوية دائمًا لبقاء النص كاملًا في الصفحة الحالية.
+        if(tryWholeRow(page,rowLabel,rest)){
           rest='';
           break;
         }
-        test.remove();
 
         const {chunk,rest:remaining}=splitWordsToFit(page,section.label,rest,continued);
         if(chunk){
-          const fitted=addLongRow(page,continued?section.label+' - تابع':section.label,chunk);
+          const fitted=addLongRow(page,rowLabel,chunk);
           if(tableBottom(page)>MAX_TABLE_BOTTOM){
             fitted.remove();
             page=pageShell('متابعة '+baseTitle);
@@ -261,6 +277,7 @@
             continue;
           }
         }
+
         rest=remaining;
         if(rest){
           page=pageShell('متابعة '+baseTitle);
