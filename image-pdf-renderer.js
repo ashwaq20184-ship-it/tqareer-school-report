@@ -76,6 +76,15 @@
         manager
       ];
     }
+    if(v === 'school'){
+      return [
+        {label:'وكيلة الشؤون المدرسية',name:'فاطمة مصطفى'},
+        manager
+      ];
+    }
+    if(v === 'none'){
+      return [];
+    }
     return [
       {label:'وكيلة الشؤون التعليمية',name:'تهاني شبكشي'},
       manager
@@ -84,7 +93,7 @@
 
   function approvalTailHtml(d){
     const approvals=selectedApprovalEntitiesImage();
-    const cols=approvals.length===3?'ipr-approval-three':'ipr-approval-two';
+    const cols=approvals.length===3?'ipr-approval-three':approvals.length===2?'ipr-approval-two':'ipr-approval-empty';
     const approvalHtml=approvals.map(item=>`
       <div>
         <div class="ipr-sign-label">${esc(item.label)}</div>
@@ -159,6 +168,7 @@
       .ipr-approval-row{display:grid;gap:14px;text-align:center;direction:rtl}
       .ipr-approval-row.ipr-approval-two{grid-template-columns:repeat(2,1fr)}
       .ipr-approval-row.ipr-approval-three{grid-template-columns:repeat(3,1fr)}
+      .ipr-approval-row.ipr-approval-empty{display:block;min-height:58px}
       .ipr-e-signline .ipr-sign{position:static;left:auto;right:auto;top:auto;bottom:auto;width:100%;display:block}
       .ipr-sign-label{font-size:15px;color:#a61919;font-weight:600;margin-bottom:7px}
       .ipr-sign-name{font-size:15px;color:#141414;font-weight:500}
