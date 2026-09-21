@@ -60,15 +60,43 @@
     return el.value || 'برنامج';
   }
 
-  function selectedDeputyImage(){
+  function selectedApprovalEntitiesImage(){
     const v = ($id('deputyChoice') && $id('deputyChoice').value) || 'educational';
-    if(v === 'student') return {label:'وكيلة الشؤون الطلابية', name:'زكية الرفاعي'};
-    if(v === 'other'){
-      const name=String(($id('otherDeputyName')&&$id('otherDeputyName').value)||'').trim();
-      return {label:'',name:name||'—'};
+    const manager={label:'مديرة المدرسة',name:'حنان الغامدي'};
+    if(v === 'activity'){
+      return [
+        {label:'رائدة النشاط',name:'سميرة السناني'},
+        {label:'وكيلة الشؤون الطلابية',name:'زكية الرفاعي'},
+        manager
+      ];
     }
-    if(v === 'none') return null;
-    return {label:'وكيلة الشؤون التعليمية', name:'تهاني شبكشي'};
+    if(v === 'student'){
+      return [
+        {label:'وكيلة الشؤون الطلابية',name:'زكية الرفاعي'},
+        manager
+      ];
+    }
+    return [
+      {label:'وكيلة الشؤون التعليمية',name:'تهاني شبكشي'},
+      manager
+    ];
+  }
+
+  function approvalTailHtml(d){
+    const approvals=selectedApprovalEntitiesImage();
+    const cols=approvals.length===3?'ipr-approval-three':'ipr-approval-two';
+    const approvalHtml=approvals.map(item=>`
+      <div>
+        <div class="ipr-sign-label">${esc(item.label)}</div>
+        <div class="ipr-sign-name">${esc(item.name)}</div>
+      </div>`).join('');
+    return `
+      <div class="ipr-preparer-row">
+        <span class="ipr-sign-label">معدة التقرير:</span>
+        <span class="ipr-sign-name">${esc(d.preparer||'—')}</span>
+      </div>
+      <div class="ipr-approval-row ${cols}">${approvalHtml}</div>
+    `;
   }
 
   function purpleImage(){
@@ -123,8 +151,15 @@
       .ipr-sign{position:absolute;left:42px;right:42px;bottom:58px;display:grid;gap:14px;text-align:center;direction:rtl}
       .ipr-sign.ipr-three{grid-template-columns:repeat(3,1fr)}
       .ipr-sign.ipr-two{grid-template-columns:repeat(2,1fr)}
-      .ipr-sign.ipr-report-sign{position:static;left:auto;right:auto;top:auto;bottom:auto;width:100%;margin-top:22px}
+      .ipr-sign.ipr-report-sign{position:static;left:auto;right:auto;top:auto;bottom:auto;width:100%;margin-top:22px;display:block}
       .ipr-signature-only-page .ipr-table{top:650px}
+      .ipr-preparer-row{text-align:right;padding:0 8px 12px 8px;white-space:nowrap}
+      .ipr-preparer-row .ipr-sign-label{display:inline;margin:0 0 0 6px}
+      .ipr-preparer-row .ipr-sign-name{display:inline}
+      .ipr-approval-row{display:grid;gap:14px;text-align:center;direction:rtl}
+      .ipr-approval-row.ipr-approval-two{grid-template-columns:repeat(2,1fr)}
+      .ipr-approval-row.ipr-approval-three{grid-template-columns:repeat(3,1fr)}
+      .ipr-e-signline .ipr-sign{position:static;left:auto;right:auto;top:auto;bottom:auto;width:100%;display:block}
       .ipr-sign-label{font-size:15px;color:#a61919;font-weight:600;margin-bottom:7px}
       .ipr-sign-name{font-size:15px;color:#141414;font-weight:500}
       .ipr-e-title{position:absolute;left:55px;right:55px;top:184px;text-align:center;font-size:23px;font-weight:700;color:${title}}
@@ -185,15 +220,9 @@
   }
 
   function addSignatures(page,d){
-    const deputy=selectedDeputyImage();
     const wrap=document.createElement('div');
-    wrap.className='ipr-sign ipr-report-sign '+(deputy?'ipr-three':'ipr-two');
-    let html=`<div><div class="ipr-sign-label">معدة التقرير</div><div class="ipr-sign-name">${esc(d.preparer||'—')}</div></div>`;
-    if(deputy) html+=deputy.label
-      ?`<div><div class="ipr-sign-label">${esc(deputy.label)}</div><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`
-      :`<div style="display:flex;align-items:center;justify-content:center"><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`;
-    html+=`<div><div class="ipr-sign-label">مديرة المدرسة</div><div class="ipr-sign-name">حنان الغامدي</div></div>`;
-    wrap.innerHTML=html;
+    wrap.className='ipr-sign ipr-report-sign';
+    wrap.innerHTML=approvalTailHtml(d);
     const host=page.querySelector('.ipr-table');
     if(host)host.appendChild(wrap);else page.appendChild(wrap);
   }
@@ -382,16 +411,9 @@
       `;
       root.appendChild(page);
       const line=page.querySelector('.ipr-e-signline');
-      const deputy=selectedDeputyImage();
       const wrap=document.createElement('div');
-      wrap.className='ipr-sign '+(deputy?'ipr-three':'ipr-two');
-      wrap.style.position='static';
-      let sign=`<div><div class="ipr-sign-label">معدة التقرير</div><div class="ipr-sign-name">${esc(d.preparer||'—')}</div></div>`;
-      if(deputy) sign+=deputy.label
-        ?`<div><div class="ipr-sign-label">${esc(deputy.label)}</div><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`
-        :`<div style="display:flex;align-items:center;justify-content:center"><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`;
-      sign+=`<div><div class="ipr-sign-label">مديرة المدرسة</div><div class="ipr-sign-name">حنان الغامدي</div></div>`;
-      wrap.innerHTML=sign;
+      wrap.className='ipr-sign';
+      wrap.innerHTML=approvalTailHtml(d);
       line.appendChild(wrap);
       pages.push(page);
     }
