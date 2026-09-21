@@ -194,6 +194,27 @@
     page.appendChild(wrap);
   }
 
+  function positionSignaturesAfterTable(page){
+    const sign=page.querySelector('.ipr-sign');
+    const table=page.querySelector('.ipr-table table');
+    if(!sign||!table)return;
+
+    // اجعل التوقيعات قريبة من نهاية الجدول بدل تثبيتها أسفل الصفحة.
+    const pageRect=page.getBoundingClientRect();
+    const tableRect=table.getBoundingClientRect();
+    const signHeight=Math.max(sign.getBoundingClientRect().height,52);
+    const tableEnd=tableRect.bottom-pageRect.top;
+
+    const gap=28;
+    const bottomSafe=50;
+    const latestTop=CSS_H-bottomSafe-signHeight;
+    const desiredTop=tableEnd+gap;
+    const top=Math.min(desiredTop,latestTop);
+
+    sign.style.top=Math.round(top)+'px';
+    sign.style.bottom='auto';
+  }
+
   function tableBottom(page){
     const table=page.querySelector('.ipr-table table');
     return table.getBoundingClientRect().bottom - page.getBoundingClientRect().top;
@@ -202,10 +223,9 @@
   function tableLimit(page){
     const signature=page.querySelector('.ipr-sign');
     if(signature){
-      const pr=page.getBoundingClientRect();
-      const sr=signature.getBoundingClientRect();
-      // نستخدم المساحة حتى أعلى التوقيعات مباشرة مع فاصل بصري صغير.
-      return Math.floor(sr.top-pr.top-14);
+      const signHeight=Math.max(signature.getBoundingClientRect().height,52);
+      // نحجز فقط مساحة التوقيعات والهامش السفلي، ونسمح للجدول باستغلال بقية الصفحة.
+      return Math.floor(CSS_H-50-signHeight-28);
     }
     // صفحات المتابعة لا تحتوي توقيعات، لذا تستفيد من معظم ارتفاع الصفحة.
     return CONTINUATION_TABLE_BOTTOM;
@@ -310,6 +330,7 @@
       }
     }
 
+    positionSignaturesAfterTable(pages[0]);
     return pages;
   }
 
