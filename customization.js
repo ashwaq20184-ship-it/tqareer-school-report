@@ -3,7 +3,9 @@
   const deputyMap={
     educational:{label:'وكيلة الشؤون التعليمية',name:'تهاني شبكشي'},
     student:{label:'وكيلة الشؤون الطلابية',name:'زكية الرفاعي'},
-    none:null
+    activity:{label:'رائدة النشاط',name:'سميرة السناني'},
+    school:{label:'وكيلة الشؤون المدرسية',name:'فاطمة مصطفى'},
+    none:{label:'مديرة المدرسة',name:'حنان الغامدي'}
   };
   const purple=[218,167,201]; // #DAA7C9
   function toggleOtherReportType(){
