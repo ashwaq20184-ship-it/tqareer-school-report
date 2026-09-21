@@ -124,6 +124,7 @@
       .ipr-sign.ipr-three{grid-template-columns:repeat(3,1fr)}
       .ipr-sign.ipr-two{grid-template-columns:repeat(2,1fr)}
       .ipr-sign.ipr-report-sign{position:static;left:auto;right:auto;top:auto;bottom:auto;width:100%;margin-top:22px}
+      .ipr-signature-only-page .ipr-table{top:650px}
       .ipr-sign-label{font-size:15px;color:#a61919;font-weight:600;margin-bottom:7px}
       .ipr-sign-name{font-size:15px;color:#141414;font-weight:500}
       .ipr-e-title{position:absolute;left:55px;right:55px;top:184px;text-align:center;font-size:23px;font-weight:700;color:${title}}
@@ -273,7 +274,6 @@
     let page=pageShell(baseTitle);
     root.appendChild(page);
     addMetaRows(page,d,type);
-    addSignatures(page,d);
     pages.push(page);
 
     for(const section of sections){
@@ -283,7 +283,6 @@
         if(!tryWholeRow(page,section.label,'')){
           page=pageShell('متابعة '+baseTitle);
           root.appendChild(page);
-          addSignatures(page,d);
           pages.push(page);
           addLongRow(page,section.label,'');
         }
@@ -306,7 +305,6 @@
             fitted.remove();
             page=pageShell('متابعة '+baseTitle);
             root.appendChild(page);
-            addSignatures(page,d);
             pages.push(page);
             continued=true;
             continue;
@@ -317,14 +315,28 @@
         if(rest){
           page=pageShell('متابعة '+baseTitle);
           root.appendChild(page);
-          addSignatures(page,d);
           pages.push(page);
           continued=true;
         }
       }
     }
 
-    positionSignaturesAfterTable(pages[0]);
+    let signaturePage=pages[pages.length-1];
+    addSignatures(signaturePage,d);
+
+    // إذا لم تتسع التوقيعات في آخر صفحة محتوى، أنشئ صفحة متابعة أخيرة
+    // قبل الشواهد لتظهر فيها التوقيعات مرة واحدة فقط.
+    if(tableBottom(signaturePage)>tableLimit(signaturePage)){
+      const sign=signaturePage.querySelector('.ipr-report-sign');
+      if(sign)sign.remove();
+
+      signaturePage=pageShell('متابعة '+baseTitle);
+      signaturePage.classList.add('ipr-signature-only-page');
+      root.appendChild(signaturePage);
+      addSignatures(signaturePage,d);
+      pages.push(signaturePage);
+    }
+
     return pages;
   }
 
