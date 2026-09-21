@@ -11,8 +11,7 @@
   const SCALE_300_DPI = TARGET_RASTER_W / CSS_W;
   const PDF_W = 595.28;
   const PDF_H = 841.89;
-  const SIGNATURE_SAFE_GAP = 165;
-  const MAX_TABLE_BOTTOM = Math.round(CSS_H - SIGNATURE_SAFE_GAP);
+  const CONTINUATION_TABLE_BOTTOM = Math.round(CSS_H - 58);
 
   const $id = id => document.getElementById(id);
   let HQ_LOGO_SRC = 'moe-logo.svg?v=20260920-1';
@@ -119,7 +118,8 @@
       .ipr-table .ipr-meta th,.ipr-table .ipr-meta td{height:62px}
       .ipr-table .ipr-long th{width:18%}
       .ipr-table .ipr-long.ipr-tight th,.ipr-table .ipr-long.ipr-tight td{padding:6px 9px;line-height:1.42;font-size:13px}
-      .ipr-sign{position:absolute;left:42px;right:42px;bottom:70px;display:grid;gap:14px;text-align:center;direction:rtl}
+      .ipr-table .ipr-long.ipr-squeeze th,.ipr-table .ipr-long.ipr-squeeze td{padding:4px 8px;line-height:1.34;font-size:12.5px}
+      .ipr-sign{position:absolute;left:42px;right:42px;bottom:58px;display:grid;gap:14px;text-align:center;direction:rtl}
       .ipr-sign.ipr-three{grid-template-columns:repeat(3,1fr)}
       .ipr-sign.ipr-two{grid-template-columns:repeat(2,1fr)}
       .ipr-sign-label{font-size:15px;color:#a61919;font-weight:600;margin-bottom:7px}
@@ -173,9 +173,9 @@
     tbody.appendChild(tr2);
   }
 
-  function addLongRow(page,label,text,compact=false){
+  function addLongRow(page,label,text,mode='normal'){
     const tr=document.createElement('tr');
-    tr.className='ipr-long'+(compact?' ipr-tight':'');
+    tr.className='ipr-long'+(mode==='tight'?' ipr-tight':mode==='squeeze'?' ipr-squeeze':'');
     tr.innerHTML=`<th>${esc(label)}</th><td colspan="3">${esc(text).replace(/\n/g,'<br>')}</td>`;
     page.querySelector('tbody').appendChild(tr);
     return tr;
@@ -199,16 +199,29 @@
     return table.getBoundingClientRect().bottom - page.getBoundingClientRect().top;
   }
 
+  function tableLimit(page){
+    const signature=page.querySelector('.ipr-sign');
+    if(signature){
+      const pr=page.getBoundingClientRect();
+      const sr=signature.getBoundingClientRect();
+      // نستخدم المساحة حتى أعلى التوقيعات مباشرة مع فاصل بصري صغير.
+      return Math.floor(sr.top-pr.top-14);
+    }
+    // صفحات المتابعة لا تحتوي توقيعات، لذا تستفيد من معظم ارتفاع الصفحة.
+    return CONTINUATION_TABLE_BOTTOM;
+  }
+
   function splitWordsToFit(page,label,text,isContinuation){
     const words=String(text||'').trim().split(/\s+/).filter(Boolean);
     if(!words.length) return {chunk:'',rest:''};
 
+    const limit=tableLimit(page);
     let lo=1,hi=words.length,best=0,row=null;
     while(lo<=hi){
       const mid=Math.floor((lo+hi)/2);
       if(row) row.remove();
       row=addLongRow(page,isContinuation?label+' - تابع':label,words.slice(0,mid).join(' '));
-      if(tableBottom(page)<=MAX_TABLE_BOTTOM){best=mid;lo=mid+1}else hi=mid-1;
+      if(tableBottom(page)<=limit){best=mid;lo=mid+1}else hi=mid-1;
     }
     if(row) row.remove();
 
@@ -217,16 +230,25 @@
   }
 
   function tryWholeRow(page,label,text){
-    const normal=addLongRow(page,label,text);
-    if(tableBottom(page)<=MAX_TABLE_BOTTOM) return normal;
+    const limit=tableLimit(page);
 
-    // إذا تجاوز النص المساحة بفارق بسيط، نضغط هذا الصف وحده بدل إنشاء صفحة جديدة لسطر أو سطرين.
-    const overflow=tableBottom(page)-MAX_TABLE_BOTTOM;
+    const normal=addLongRow(page,label,text);
+    if(tableBottom(page)<=limit) return normal;
+    const normalOverflow=tableBottom(page)-limit;
     normal.remove();
-    if(overflow<=75){
-      const compact=addLongRow(page,label,text,true);
-      if(tableBottom(page)<=MAX_TABLE_BOTTOM) return compact;
-      compact.remove();
+
+    // إذا كان التجاوز بسيطًا، نضغط الصف نفسه بدل ترحيل سطر أو سطرين.
+    if(normalOverflow<=120){
+      const tight=addLongRow(page,label,text,'tight');
+      if(tableBottom(page)<=limit) return tight;
+      const tightOverflow=tableBottom(page)-limit;
+      tight.remove();
+
+      if(tightOverflow<=60){
+        const squeeze=addLongRow(page,label,text,'squeeze');
+        if(tableBottom(page)<=limit) return squeeze;
+        squeeze.remove();
+      }
     }
     return null;
   }
@@ -243,6 +265,7 @@
     let page=pageShell(baseTitle);
     root.appendChild(page);
     addMetaRows(page,d,type);
+    addSignatures(page,d);
     pages.push(page);
 
     for(const section of sections){
@@ -269,7 +292,7 @@
         const {chunk,rest:remaining}=splitWordsToFit(page,section.label,rest,continued);
         if(chunk){
           const fitted=addLongRow(page,rowLabel,chunk);
-          if(tableBottom(page)>MAX_TABLE_BOTTOM){
+          if(tableBottom(page)>tableLimit(page)){
             fitted.remove();
             page=pageShell('متابعة '+baseTitle);
             root.appendChild(page);pages.push(page);
@@ -287,7 +310,6 @@
       }
     }
 
-    addSignatures(pages[pages.length-1],d);
     return pages;
   }
 
