@@ -282,7 +282,9 @@
       if(!rest){
         if(!tryWholeRow(page,section.label,'')){
           page=pageShell('متابعة '+baseTitle);
-          root.appendChild(page);pages.push(page);
+          root.appendChild(page);
+          addSignatures(page,d);
+          pages.push(page);
           addLongRow(page,section.label,'');
         }
         continue;
@@ -303,7 +305,9 @@
           if(tableBottom(page)>tableLimit(page)){
             fitted.remove();
             page=pageShell('متابعة '+baseTitle);
-            root.appendChild(page);pages.push(page);
+            root.appendChild(page);
+            addSignatures(page,d);
+            pages.push(page);
             continued=true;
             continue;
           }
@@ -312,7 +316,9 @@
         rest=remaining;
         if(rest){
           page=pageShell('متابعة '+baseTitle);
-          root.appendChild(page);pages.push(page);
+          root.appendChild(page);
+          addSignatures(page,d);
+          pages.push(page);
           continued=true;
         }
       }
