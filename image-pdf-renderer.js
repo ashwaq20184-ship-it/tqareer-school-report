@@ -392,6 +392,42 @@
     return pages;
   }
 
+  async function ensureReportFontsReady(){
+    if(document.fonts){
+      try{
+        await Promise.all([
+          document.fonts.load('400 16px Tajawal','العربية'),
+          document.fonts.load('500 16px Tajawal','العربية'),
+          document.fonts.load('700 16px Tajawal','العربية')
+        ]);
+      }catch(e){}
+      try{
+        if(document.fonts.ready) await document.fonts.ready;
+      }catch(e){}
+    }
+  }
+
+  function nextAnimationFrame(){
+    return new Promise(resolve=>requestAnimationFrame(()=>resolve()));
+  }
+
+  async function settleVirtualLayout(root,reportPages=[]){
+    // Safari على الجوال قد يحتاج أكثر من دورة رسم حتى تثبت قياسات الخطوط والسطور.
+    void root.offsetWidth;
+    await nextAnimationFrame();
+    void root.offsetHeight;
+    await nextAnimationFrame();
+
+    // قياس التوقيعات مرة أولى بعد استقرار النص.
+    if(reportPages[0]) positionSignaturesAfterTable(reportPages[0]);
+
+    void root.offsetWidth;
+    await nextAnimationFrame();
+
+    // ثم إعادة القياس مرة ثانية مباشرة قبل الالتقاط.
+    if(reportPages[0]) positionSignaturesAfterTable(reportPages[0]);
+  }
+
   async function waitForImages(root){
     const images=[...root.querySelectorAll('img')];
     await Promise.all(images.map(img=>{
@@ -436,30 +472,47 @@
     await ensureHtml2Canvas();
     await prepareHqLogoSource();
 
+    // أهم خطوة لتوحيد الجوال والكمبيوتر: لا نبدأ أي قياس قبل اكتمال تحميل الخط.
+    await ensureReportFontsReady();
+
     const root=document.createElement('div');
     root.setAttribute('aria-hidden','true');
-    root.style.cssText='position:fixed;left:-100000px;top:0;width:'+CSS_W+'px;background:#fff;z-index:-2147483647;';
+    // مساحة افتراضية ثابتة 794px لا تتأثر بعرض شاشة الجوال أو تكبير Safari.
+    root.style.cssText=[
+      'position:absolute',
+      'left:-1200px',
+      'top:0',
+      'width:'+CSS_W+'px',
+      'min-width:'+CSS_W+'px',
+      'max-width:'+CSS_W+'px',
+      'background:#fff',
+      'pointer-events:none',
+      'z-index:-2147483647',
+      'contain:layout style'
+    ].join(';');
     document.body.appendChild(root);
 
     try{
+      // المرور الأول يهيئ Safari/Chrome Mobile لحسابات الخط والسطور الفعلية.
+      const warmupPages=buildReportPages(root,d);
+      await settleVirtualLayout(root,warmupPages);
+      warmupPages.forEach(p=>p.remove());
+
+      // المرور الثاني هو الذي نعتمد عليه في التقسيم النهائي.
       const reportPages=buildReportPages(root,d);
       const evidencePages=buildEvidencePages(root,d);
       const pages=[...reportPages,...evidencePages];
+
       await waitForImages(root);
-      if(document.fonts){
-        try{
-          await Promise.all([
-            document.fonts.load('400 16px Tajawal'),
-            document.fonts.load('500 16px Tajawal'),
-            document.fonts.load('700 16px Tajawal')
-          ]);
-        }catch(e){}
-        if(document.fonts.ready) await document.fonts.ready;
-      }
+      await ensureReportFontsReady();
+      await settleVirtualLayout(root,reportPages);
 
       const doc=await PDFLib.PDFDocument.create();
       for(let i=0;i<pages.length;i++){
         if(typeof show==='function') show('جارٍ تجهيز صفحة '+(i+1)+' من '+pages.length+' بدقة 300 DPI...');
+        void pages[i].offsetHeight;
+        await nextAnimationFrame();
+        if(i===0) positionSignaturesAfterTable(reportPages[0]);
         const jpgBytes=await renderPageToJpeg(pages[i]);
         const img=await doc.embedJpg(jpgBytes);
         const p=doc.addPage([PDF_W,PDF_H]);
