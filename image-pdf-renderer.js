@@ -103,6 +103,7 @@
       .ipr-page{
         width:${CSS_W}px;height:${CSS_H}px;position:relative;overflow:hidden;background:#fff;color:#141414;
         direction:rtl;font-family:"Tajawal",Tahoma,"Segoe UI",Arial,sans-serif;font-weight:400;
+        -webkit-text-size-adjust:100%;text-size-adjust:100%;font-synthesis:none;
       }
       .ipr-top,.ipr-bottom{position:absolute;left:0;right:0;height:27px;background:linear-gradient(90deg,#138a8b,#23a576)}
       .ipr-top{top:0}.ipr-bottom{bottom:0}
@@ -122,6 +123,7 @@
       .ipr-sign{position:absolute;left:42px;right:42px;bottom:58px;display:grid;gap:14px;text-align:center;direction:rtl}
       .ipr-sign.ipr-three{grid-template-columns:repeat(3,1fr)}
       .ipr-sign.ipr-two{grid-template-columns:repeat(2,1fr)}
+      .ipr-sign.ipr-report-sign{position:static;left:auto;right:auto;top:auto;bottom:auto;width:100%;margin-top:22px}
       .ipr-sign-label{font-size:15px;color:#a61919;font-weight:600;margin-bottom:7px}
       .ipr-sign-name{font-size:15px;color:#141414;font-weight:500}
       .ipr-e-title{position:absolute;left:55px;right:55px;top:184px;text-align:center;font-size:23px;font-weight:700;color:${title}}
@@ -184,50 +186,36 @@
   function addSignatures(page,d){
     const deputy=selectedDeputyImage();
     const wrap=document.createElement('div');
-    wrap.className='ipr-sign '+(deputy?'ipr-three':'ipr-two');
+    wrap.className='ipr-sign ipr-report-sign '+(deputy?'ipr-three':'ipr-two');
     let html=`<div><div class="ipr-sign-label">معدة التقرير</div><div class="ipr-sign-name">${esc(d.preparer||'—')}</div></div>`;
     if(deputy) html+=deputy.label
       ?`<div><div class="ipr-sign-label">${esc(deputy.label)}</div><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`
       :`<div style="display:flex;align-items:center;justify-content:center"><div class="ipr-sign-name">${esc(deputy.name)}</div></div>`;
     html+=`<div><div class="ipr-sign-label">مديرة المدرسة</div><div class="ipr-sign-name">حنان الغامدي</div></div>`;
     wrap.innerHTML=html;
-    page.appendChild(wrap);
+    const host=page.querySelector('.ipr-table');
+    if(host)host.appendChild(wrap);else page.appendChild(wrap);
   }
 
   function positionSignaturesAfterTable(page){
-    const sign=page.querySelector('.ipr-sign');
-    const table=page.querySelector('.ipr-table table');
-    if(!sign||!table)return;
-
-    // اجعل التوقيعات قريبة من نهاية الجدول بدل تثبيتها أسفل الصفحة.
-    const pageRect=page.getBoundingClientRect();
-    const tableRect=table.getBoundingClientRect();
-    const signHeight=Math.max(sign.getBoundingClientRect().height,52);
-    const tableEnd=tableRect.bottom-pageRect.top;
-
-    const gap=28;
-    const bottomSafe=50;
-    const latestTop=CSS_H-bottomSafe-signHeight;
-    const desiredTop=tableEnd+gap;
-    const top=Math.min(desiredTop,latestTop);
-
-    sign.style.top=Math.round(top)+'px';
-    sign.style.bottom='auto';
+    // التوقيعات داخل تدفق .ipr-table مباشرة؛ لا حاجة لأي قياس مرتبط بحجم شاشة الجهاز.
+    return;
   }
 
   function tableBottom(page){
-    const table=page.querySelector('.ipr-table table');
-    return table.getBoundingClientRect().bottom - page.getBoundingClientRect().top;
+    const wrap=page.querySelector('.ipr-table');
+    const table=wrap&&wrap.querySelector('table');
+    if(!wrap||!table)return 0;
+    return wrap.offsetTop+table.offsetHeight;
   }
 
   function tableLimit(page){
-    const signature=page.querySelector('.ipr-sign');
+    const signature=page.querySelector('.ipr-report-sign');
     if(signature){
-      const signHeight=Math.max(signature.getBoundingClientRect().height,52);
-      // نحجز فقط مساحة التوقيعات والهامش السفلي، ونسمح للجدول باستغلال بقية الصفحة.
-      return Math.floor(CSS_H-50-signHeight-28);
+      const signHeight=Math.max(signature.offsetHeight,52);
+      // الجدول + 22px فراغ + التوقيعات يجب أن تبقى فوق الشريط السفلي.
+      return Math.floor(CSS_H-48-signHeight-22);
     }
-    // صفحات المتابعة لا تحتوي توقيعات، لذا تستفيد من معظم ارتفاع الصفحة.
     return CONTINUATION_TABLE_BOTTOM;
   }
 
@@ -486,6 +474,9 @@
       'min-width:'+CSS_W+'px',
       'max-width:'+CSS_W+'px',
       'background:#fff',
+      'font-size:16px',
+      '-webkit-text-size-adjust:100%',
+      'text-size-adjust:100%',
       'pointer-events:none',
       'z-index:-2147483647',
       'contain:layout style'
