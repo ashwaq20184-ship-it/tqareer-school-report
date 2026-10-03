@@ -51,6 +51,19 @@
     }
   }
 
+  function selectedSchoolHeaderLinesImage(){
+    const v=($id('schoolHeaderChoice')&&$id('schoolHeaderChoice').value)||'merged';
+    const middle='متوسطة جميلة بنت عمر بن الخطاب بينبع البحر';
+    const adult='المتوسطة الأولى للكبيرات';
+    if(v==='middle') return [middle];
+    if(v==='adult') return [adult];
+    return [middle,adult];
+  }
+
+  function selectedSchoolHeaderHtmlImage(){
+    return selectedSchoolHeaderLinesImage().map(esc).join('<br>');
+  }
+
   function selectedReportTypeImage(){
     const el = $id('reportType');
     if(!el) return 'برنامج';
@@ -206,8 +219,7 @@
         المملكة العربية السعودية<br>
         وزارة التعليم<br>
         الإدارة العامة للتعليم بمنطقة المدينة المنورة<br>
-        متوسطة جميلة بنت عمر بن الخطاب بينبع البحر<br>
-        المتوسطة الأولى لتعليم الكبيرات
+        ${selectedSchoolHeaderHtmlImage()}
       </div>
       <div class="ipr-line"></div>
       <div class="ipr-title">${esc(continuationTitle)}</div>
@@ -420,8 +432,7 @@
           المملكة العربية السعودية<br>
           وزارة التعليم<br>
           الإدارة العامة للتعليم بمنطقة المدينة المنورة<br>
-          متوسطة جميلة بنت عمر بن الخطاب بينبع البحر<br>
-        المتوسطة الأولى لتعليم الكبيرات
+          ${selectedSchoolHeaderHtmlImage()}
         </div>
         <div class="ipr-line"></div>
         <div class="ipr-e-title">شواهد تنفيذ ${esc(type)}</div>
