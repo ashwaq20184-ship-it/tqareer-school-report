@@ -14,6 +14,15 @@
     if(!type||!wrap)return;
     wrap.style.display=type.value==='other'?'block':'none';
   }
+  function selectedSchoolHeaderLines(){
+    const v=(byId('schoolHeaderChoice')&&byId('schoolHeaderChoice').value)||'merged';
+    const middle='متوسطة جميلة بنت عمر بن الخطاب بينبع البحر';
+    const adult='المتوسطة الأولى للكبيرات';
+    if(v==='middle')return [middle];
+    if(v==='adult')return [adult];
+    return [middle,adult];
+  }
+
   function selectedReportType(){
     const el=byId('reportType');
     if(!el)return 'برنامج';
@@ -42,6 +51,19 @@
     }
     return deputyMap[value]||null;
   }
+  header=function(page,font,logo){
+    bar(page,0);
+    const lw=mm(38),lh=lw*(logo.height/logo.width);
+    page.drawImage(logo,{x:mm(12),y:A4H-mm(11)-lh,width:lw,height:lh});
+    lineTop(page,10,39,200,39);
+    let y=11;
+    const lines=['المملكة العربية السعودية','وزارة التعليم','الإدارة العامة للتعليم بمنطقة المدينة المنورة',...selectedSchoolHeaderLines()];
+    for(const s of lines){
+      drawTextTop(page,font,102,y,96,s,12.5,C.dark,'right');
+      y+=5.4;
+    }
+  };
+
   function selectedTableFill(){
     return isPurpleSelected()?purple:C.gray;
   }
@@ -56,6 +78,7 @@
   // حفظ خيارات التخصيص مع بقية بيانات التقرير واستعادتها على الجهاز نفسه.
   try{
     const saved=JSON.parse(localStorage.getItem('schoolReport')||'{}');
+    if(byId('schoolHeaderChoice')&&saved.schoolHeaderChoice)byId('schoolHeaderChoice').value=saved.schoolHeaderChoice;
     if(byId('reportType')&&saved.reportType)byId('reportType').value=saved.reportType;
     if(byId('otherReportType')&&saved.otherReportType)byId('otherReportType').value=saved.otherReportType;
     toggleOtherReportType();
@@ -71,6 +94,7 @@
       if(oldSave)oldSave.call(this);
       try{
         const saved=JSON.parse(localStorage.getItem('schoolReport')||'{}');
+        saved.schoolHeaderChoice=byId('schoolHeaderChoice')?byId('schoolHeaderChoice').value:'merged';
         saved.reportType=byId('reportType').value;
         saved.otherReportType=byId('otherReportType')?byId('otherReportType').value:'';
         saved.deputyChoice=byId('deputyChoice').value;
@@ -97,6 +121,7 @@
         const baseIds=['program','target','count','goal','steps','results','preparer'];
         const cleared=baseIds.every(id=>!String(byId(id).value||'').trim())&&!localStorage.getItem('schoolReport');
         if(cleared){
+          if(byId('schoolHeaderChoice'))byId('schoolHeaderChoice').value='merged';
           byId('reportType').value='برنامج';
           if(byId('otherReportType'))byId('otherReportType').value='';
           toggleOtherReportType();
