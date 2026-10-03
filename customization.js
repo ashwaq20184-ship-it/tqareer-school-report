@@ -147,7 +147,7 @@
     let y=55,h=14;
     cell(page,font,165,y,35,h,'اسم '+reportType,tableFill,labelColor,labelSize,'center');
     cell(page,font,105,y,60,h,d.program,null,C.dark,12.5);
-    cell(page,font,70,y,35,h,'تاريخ التنفيذ',tableFill,labelColor,labelSize,'center');
+    cell(page,font,70,y,35,h,d.dateLabel||'تاريخ التنفيذ',tableFill,labelColor,labelSize,'center');
     cell(page,font,10,y,60,h,d.date,null,C.dark,12.5,'center');
     y+=h;
     cell(page,font,165,y,35,h,'الفئة المستهدفة',tableFill,labelColor,labelSize,'center');
@@ -282,7 +282,7 @@
       reportValueHeight(font,d.program,60,12.5,14),
       reportValueHeight(font,d.date,60,12.5,14)
     );
-    drawPairRow(page,font,y,row1H,'اسم '+reportType,d.program,'تاريخ التنفيذ',d.date,tableFill,labelColor,labelSize);
+    drawPairRow(page,font,y,row1H,'اسم '+reportType,d.program,d.dateLabel||'تاريخ التنفيذ',d.date,tableFill,labelColor,labelSize);
     y+=row1H;
 
     const row2H=Math.max(
