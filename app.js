@@ -49,9 +49,31 @@ function fillDays(sel){
   el.value=String(Math.min(chosen,max));
 }
 function hijriText(){const d=$('hDay').value||DEFAULT_HIJRI.d,m=$('hMonth').value||DEFAULT_HIJRI.m,y=$('hYear').value||DEFAULT_HIJRI.y;return `${d} / ${m} / ${y} هـ`}
+function fillOptionalMultiHijriSelects(){
+  const dayIds=['fromDay','toDay'],monthIds=['fromMonth','toMonth'],yearIds=['fromYear','toYear'];
+  for(const id of dayIds){
+    const el=$(id);if(!el)continue;const keep=el.value;el.innerHTML='';el.add(new Option('يوم',''));
+    for(let n=1;n<=30;n++)el.add(new Option(String(n),String(n)));
+    if(keep)el.value=keep;
+  }
+  for(const id of monthIds){
+    const el=$(id);if(!el)continue;const keep=el.value;el.innerHTML='';el.add(new Option('شهر',''));
+    for(let n=1;n<=12;n++)el.add(new Option(String(n),String(n)));
+    if(keep)el.value=keep;
+  }
+  const years=Object.keys(HIJRI_MONTH_LENGTHS).map(Number).filter(y=>y<=1457).sort((a,b)=>a-b);
+  for(const id of yearIds){
+    const el=$(id);if(!el)continue;const keep=el.value;el.innerHTML='';el.add(new Option('سنة',''));
+    for(const y of years)el.add(new Option(String(y),String(y)));
+    if(keep)el.value=keep;
+  }
+}
 function manualHijriText(prefix){
   const d=String($(prefix+'Day').value||'').trim(),m=String($(prefix+'Month').value||'').trim(),y=String($(prefix+'Year').value||'').trim();
   return d&&m&&y?`${d} / ${m} / ${y} هـ`:'';
+}
+function partialManualHijri(prefix){
+  return ['Day','Month','Year'].some(part=>String(($(prefix+part)&&$(prefix+part).value)||'').trim());
 }
 function executionMode(){return ($('executionMode')&&$('executionMode').value)||'single'}
 function executionDateLabel(){return executionMode()==='multi'?'مدة التنفيذ':'تاريخ التنفيذ'}
@@ -59,20 +81,20 @@ function executionDateValue(){
   if(executionMode()!=='multi')return hijriText();
   const duration=String(($('durationText')&&$('durationText').value)||'').trim();
   const from=manualHijriText('from'),to=manualHijriText('to');
-  const period=from&&to?`من ${from} إلى ${to}`:'';
+  let period='';
+  if(from&&to)period=`من ${from} إلى ${to}`;
+  else if(from)period=`من ${from}`;
+  else if(to)period=`إلى ${to}`;
   return [duration,period].filter(Boolean).join(' — ');
 }
 function validateExecutionFields(){
   if(executionMode()!=='multi')return '';
   const duration=String(($('durationText')&&$('durationText').value)||'').trim();
   if(!duration)return 'اكتبي مدة التنفيذ، مثل: أسبوع أو أسبوعان أو فصل دراسي.';
-  const vals=[
-    ['fromDay',1,30,'يوم البداية'],['fromMonth',1,12,'شهر البداية'],['fromYear',1400,1600,'سنة البداية'],
-    ['toDay',1,30,'يوم النهاية'],['toMonth',1,12,'شهر النهاية'],['toYear',1400,1600,'سنة النهاية']
-  ];
-  for(const [id,min,max,label] of vals){
-    const raw=String(($(id)&&$(id).value)||'').trim(),n=Number(raw);
-    if(!raw||!Number.isInteger(n)||n<min||n>max)return 'تحققي من '+label+' في التاريخ الهجري.';
+  for(const prefix of ['from','to']){
+    const any=partialManualHijri(prefix);
+    const complete=!!manualHijriText(prefix);
+    if(any&&!complete)return prefix==='from'?'إذا أدخلتِ تاريخ البداية فأكملي اليوم والشهر والسنة، أو اتركيه فارغًا.':'إذا أدخلتِ تاريخ النهاية فأكملي اليوم والشهر والسنة، أو اتركيه فارغًا.';
   }
   return '';
 }
@@ -87,13 +109,14 @@ function toggleExecutionMode(){
   if($('multiDateWrap'))$('multiDateWrap').style.display=multi?'block':'none';
   updateDate();
 }
-function initHijri(){fillYears(DEFAULT_HIJRI.y);fillMonths(DEFAULT_HIJRI.m);fillDays(DEFAULT_HIJRI.d);updateDate();toggleExecutionMode()}
+function initHijri(){fillYears(DEFAULT_HIJRI.y);fillMonths(DEFAULT_HIJRI.m);fillDays(DEFAULT_HIJRI.d);fillOptionalMultiHijriSelects();updateDate();toggleExecutionMode()}
 initHijri();
 $('hYear').addEventListener('change',()=>{fillDays($('hDay').value);updateDate()});
 $('hMonth').addEventListener('change',()=>{fillDays($('hDay').value);updateDate()});
 $('hDay').addEventListener('change',updateDate);
 if($('executionMode'))$('executionMode').addEventListener('change',toggleExecutionMode);
-for(const id of ['durationText','fromDay','fromMonth','fromYear','toDay','toMonth','toYear'])if($(id))$(id).addEventListener('input',updateDate);
+if($('durationText'))$('durationText').addEventListener('input',updateDate);
+for(const id of ['fromDay','fromMonth','fromYear','toDay','toMonth','toYear'])if($(id))$(id).addEventListener('change',updateDate);
 function show(msg){$('notice').textContent=msg;$('notice').classList.add('show')}function hide(){$('notice').classList.remove('show')}
 async function compressImage(file,maxW=1200,maxH=1200,q=.76){return new Promise((res,rej)=>{const r=new FileReader();r.onerror=rej;r.onload=e=>{const im=new Image();im.onerror=rej;im.onload=()=>{let s=Math.min(1,maxW/im.naturalWidth,maxH/im.naturalHeight),w=Math.max(1,Math.round(im.naturalWidth*s)),h=Math.max(1,Math.round(im.naturalHeight*s)),c=document.createElement('canvas');c.width=w;c.height=h;let x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);res(c.toDataURL('image/jpeg',q))};im.src=e.target.result};r.readAsDataURL(file)})}
 function renderPhotos(){
