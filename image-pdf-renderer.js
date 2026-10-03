@@ -176,7 +176,7 @@
       .ipr-table th,.ipr-table td{border:1px solid #222;padding:8px 11px;vertical-align:middle;line-height:1.55}
       .ipr-table th{background:${fill};color:${label};font-weight:600;text-align:center}
       .ipr-table td{background:#fff;color:#111;text-align:right;font-weight:400;white-space:normal;overflow-wrap:anywhere;word-break:normal}
-      .ipr-table .ipr-meta th,.ipr-table .ipr-meta td{height:62px}
+      .ipr-table .ipr-meta th,.ipr-table .ipr-meta td{min-height:62px}
       .ipr-table .ipr-long th{width:18%}
       .ipr-table .ipr-long.ipr-tight th,.ipr-table .ipr-long.ipr-tight td{padding:6px 9px;line-height:1.42;font-size:13px}
       .ipr-table .ipr-long.ipr-squeeze th,.ipr-table .ipr-long.ipr-squeeze td{padding:4px 8px;line-height:1.34;font-size:12.5px}
@@ -236,7 +236,8 @@
     const tbody=page.querySelector('tbody');
     const tr1=document.createElement('tr');
     tr1.className='ipr-meta';
-    tr1.innerHTML=`<th>اسم ${esc(type)}</th><td>${esc(d.program||'')}</td><th>تاريخ التنفيذ</th><td style="text-align:center">${esc(d.date||'')}</td>`;
+    const dateLabel=String(d.dateLabel||'تاريخ التنفيذ');
+    tr1.innerHTML=`<th>اسم ${esc(type)}</th><td>${esc(d.program||'')}</td><th>${esc(dateLabel)}</th><td style="text-align:center">${esc(d.date||'')}</td>`;
     tbody.appendChild(tr1);
     const tr2=document.createElement('tr');
     tr2.className='ipr-meta';
