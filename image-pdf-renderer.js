@@ -325,13 +325,33 @@
     return null;
   }
 
+  function cleanRepeatedSectionHeadingImage(text,kind,type){
+    let s=String(text||'').trim();
+    if(!s)return s;
+    let patterns=[];
+    if(kind==='goal'){
+      patterns=['الهدف من '+type,'الهدف من البرنامج','الهدف من المبادرة','الهدف من الورشة','الهدف'];
+    }else if(kind==='steps'){
+      patterns=['إجراءات التنفيذ','اجراءات التنفيذ','الإجراءات','الاجراءات','إجراءات','اجراءات'];
+    }else if(kind==='results'){
+      patterns=['المخرجات وقياس الأثر','المخرجات وقياس الاثر','النتائج والمخرجات','المخرجات','قياس الأثر','قياس الاثر'];
+    }
+    for(const p of patterns){
+      if(s.startsWith(p)){
+        s=s.slice(p.length).replace(/^[\\s:：\\-–—]+/u,'').trim();
+        break;
+      }
+    }
+    return s;
+  }
+
   function buildReportPages(root,d){
     const type=selectedReportTypeImage();
     const baseTitle='تقرير تنفيذ '+type+' '+(d.program||'........................');
     const sections=[
-      {label:'الهدف من '+type,text:String(d.goal||'')},
-      {label:'إجراءات التنفيذ',text:String(d.steps||'')},
-      {label:'المخرجات وقياس الأثر',text:String(d.results||'')}
+      {label:'الهدف من '+type,text:cleanRepeatedSectionHeadingImage(d.goal,'goal',type)},
+      {label:'إجراءات التنفيذ',text:cleanRepeatedSectionHeadingImage(d.steps,'steps',type)},
+      {label:'المخرجات وقياس الأثر',text:cleanRepeatedSectionHeadingImage(d.results,'results',type)}
     ];
     const pages=[];
     let page=pageShell(baseTitle);
