@@ -11,8 +11,11 @@
   function toggleOtherReportType(){
     const type=byId('reportType');
     const wrap=byId('otherReportTypeWrap');
+    const input=byId('otherReportType');
     if(!type||!wrap)return;
-    wrap.style.display=type.value==='other'?'block':'none';
+    const isOther=type.value==='other';
+    wrap.style.display=isOther?'block':'none';
+    if(input)input.required=isOther;
   }
   function selectedSchoolHeaderLines(){
     const v=(byId('schoolHeaderChoice')&&byId('schoolHeaderChoice').value)||'merged';
@@ -26,11 +29,30 @@
   function selectedReportType(){
     const el=byId('reportType');
     if(!el)return 'برنامج';
+    if(el.value==='none')return '';
     if(el.value==='other'){
-      const custom=String((byId('otherReportType')&&byId('otherReportType').value)||'').trim();
-      return custom||'أخرى';
+      return String((byId('otherReportType')&&byId('otherReportType').value)||'').trim();
     }
     return el.value||'برنامج';
+  }
+  function selectedReportTitleStyle(d){
+    return String((d&&d.reportTitleStyle)||(byId('reportTitleStyle')&&byId('reportTitleStyle').value)||'execution');
+  }
+  function reportTitleText(d,type){
+    const title=String((d&&d.program)||'').trim()||'........................';
+    const kind=String(type||'').trim();
+    const style=selectedReportTitleStyle(d);
+    if(style==='titleOnly')return ('تقرير '+title).trim();
+    if(style==='withoutExecution')return ('تقرير '+(kind?kind+' ':'')+title).trim();
+    return ('تقرير تنفيذ '+(kind?kind+' ':'')+title).trim();
+  }
+  function evidenceTitleText(d,type){
+    const title=String((d&&d.program)||'').trim()||'........................';
+    const kind=String(type||'').trim();
+    const style=selectedReportTitleStyle(d);
+    if(style==='titleOnly')return ('شواهد '+title).trim();
+    if(style==='withoutExecution')return ('شواهد '+(kind?kind+' ':'')+title).trim();
+    return ('شواهد تنفيذ '+(kind?kind+' ':'')+title).trim();
   }
   function isPurpleSelected(){
     const el=byId('tableColor');
@@ -81,6 +103,7 @@
     if(byId('schoolHeaderChoice')&&saved.schoolHeaderChoice)byId('schoolHeaderChoice').value=saved.schoolHeaderChoice;
     if(byId('reportType')&&saved.reportType)byId('reportType').value=saved.reportType;
     if(byId('otherReportType')&&saved.otherReportType)byId('otherReportType').value=saved.otherReportType;
+    if(byId('reportTitleStyle')&&saved.reportTitleStyle)byId('reportTitleStyle').value=saved.reportTitleStyle;
     toggleOtherReportType();
     if(byId('deputyChoice')&&saved.deputyChoice)byId('deputyChoice').value=saved.deputyChoice;
     if(byId('otherDeputyName')&&saved.otherDeputyName)byId('otherDeputyName').value=saved.otherDeputyName;
@@ -97,6 +120,7 @@
         saved.schoolHeaderChoice=byId('schoolHeaderChoice')?byId('schoolHeaderChoice').value:'merged';
         saved.reportType=byId('reportType').value;
         saved.otherReportType=byId('otherReportType')?byId('otherReportType').value:'';
+        saved.reportTitleStyle=byId('reportTitleStyle')?byId('reportTitleStyle').value:'execution';
         saved.deputyChoice=byId('deputyChoice').value;
         saved.otherDeputyName=byId('otherDeputyName')?byId('otherDeputyName').value:'';
         saved.tableColor=byId('tableColor').value;
@@ -124,6 +148,7 @@
           if(byId('schoolHeaderChoice'))byId('schoolHeaderChoice').value='merged';
           byId('reportType').value='برنامج';
           if(byId('otherReportType'))byId('otherReportType').value='';
+          if(byId('reportTitleStyle'))byId('reportTitleStyle').value='execution';
           toggleOtherReportType();
           byId('deputyChoice').value='educational';
           if(byId('otherDeputyName'))byId('otherDeputyName').value='';
@@ -143,9 +168,9 @@
     const reportType=selectedReportType();
     const deputy=selectedDeputy();
     header(page,font,logo);
-    drawTextTop(page,font,30,43,150,'تقرير تنفيذ '+reportType+' '+(d.program||'........................'),20,titleColor,'center');
+    drawTextTop(page,font,30,43,150,reportTitleText(d,reportType),20,titleColor,'center');
     let y=55,h=14;
-    cell(page,font,165,y,35,h,'اسم '+reportType,tableFill,labelColor,labelSize,'center');
+    cell(page,font,165,y,35,h,reportType?'اسم '+reportType:'عنوان التقرير',tableFill,labelColor,labelSize,'center');
     cell(page,font,105,y,60,h,d.program,null,C.dark,12.5);
     cell(page,font,70,y,35,h,d.dateLabel||'تاريخ التنفيذ',tableFill,labelColor,labelSize,'center');
     cell(page,font,10,y,60,h,d.date,null,C.dark,12.5,'center');
@@ -155,7 +180,7 @@
     cell(page,font,70,y,35,h,'عدد المستفيدات',tableFill,labelColor,labelSize,'center');
     cell(page,font,10,y,60,h,d.count,null,C.dark,12.5,'center');
     y+=h;
-    for(const [lab,txt,rh] of [['الهدف من '+reportType,d.goal,30],['إجراءات التنفيذ',d.steps,34],['المخرجات وقياس الأثر',d.results,34]]){
+    for(const [lab,txt,rh] of [[reportType?'الهدف من '+reportType:'الهدف',d.goal,30],['إجراءات التنفيذ',d.steps,34],['المخرجات وقياس الأثر',d.results,34]]){
       cell(page,font,165,y,35,rh,lab,tableFill,labelColor,labelSize,'center');
       cell(page,font,10,y,155,rh,txt,null,C.dark,12.5,'right',2,rh>=30);
       y+=rh;
@@ -180,8 +205,8 @@
     const reportType=selectedReportType();
     const titleColor=isPurpleSelected()?C.dark:C.blue;
     header(page,font,logo);
-    drawTextTop(page,font,30,44,150,'شواهد تنفيذ '+reportType,21,titleColor,'center');
-    drawTextTop(page,font,25,53,160,(d.program||'........................')+'   '+d.date,12.5,[85,85,85],'center');
+    drawTextTop(page,font,30,44,150,evidenceTitleText(d,reportType),21,titleColor,'center');
+    drawTextTop(page,font,25,53,160,d.date||'',12.5,[85,85,85],'center');
     const allImages=(d.images||[]).slice(0,4);
     const allTitles=(d.evidenceTitles||[]).slice(0,4);
     const pos=[[107,63],[12,63],[107,146],[12,146]];
@@ -271,7 +296,7 @@
     const titleColor=isPurpleSelected()?C.dark:C.blue;
     const reportType=selectedReportType();
     const deputy=selectedDeputy();
-    const title='تقرير تنفيذ '+reportType+' '+(d.program||'........................');
+    const title=reportTitleText(d,reportType);
     const bottom=205;
     let page=doc.addPage([A4W,A4H]);
     let continuation=false;
@@ -282,7 +307,7 @@
       reportValueHeight(font,d.program,60,12.5,14),
       reportValueHeight(font,d.date,60,12.5,14)
     );
-    drawPairRow(page,font,y,row1H,'اسم '+reportType,d.program,d.dateLabel||'تاريخ التنفيذ',d.date,tableFill,labelColor,labelSize);
+    drawPairRow(page,font,y,row1H,reportType?'اسم '+reportType:'عنوان التقرير',d.program,d.dateLabel||'تاريخ التنفيذ',d.date,tableFill,labelColor,labelSize);
     y+=row1H;
 
     const row2H=Math.max(
@@ -297,7 +322,7 @@
     y+=row2H;
 
     const sections=[
-      {label:'الهدف من '+reportType,text:d.goal,minH:30},
+      {label:reportType?'الهدف من '+reportType:'الهدف',text:d.goal,minH:30},
       {label:'إجراءات التنفيذ',text:d.steps,minH:34},
       {label:'المخرجات وقياس الأثر',text:d.results,minH:34}
     ];
