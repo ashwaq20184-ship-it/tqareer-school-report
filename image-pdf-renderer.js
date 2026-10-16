@@ -67,10 +67,33 @@
   function selectedReportTypeImage(){
     const el = $id('reportType');
     if(!el) return 'برنامج';
+    if(el.value === 'none') return '';
     if(el.value === 'other'){
-      return String(($id('otherReportType') && $id('otherReportType').value) || '').trim() || 'أخرى';
+      return String(($id('otherReportType') && $id('otherReportType').value) || '').trim();
     }
     return el.value || 'برنامج';
+  }
+
+  function selectedReportTitleStyleImage(d){
+    return String((d&&d.reportTitleStyle)||($id('reportTitleStyle')&&$id('reportTitleStyle').value)||'execution');
+  }
+
+  function reportTitleImage(d,type){
+    const title=String((d&&d.program)||'').trim()||'........................';
+    const kind=String(type||'').trim();
+    const style=selectedReportTitleStyleImage(d);
+    if(style==='titleOnly') return ('تقرير '+title).trim();
+    if(style==='withoutExecution') return ('تقرير '+(kind?kind+' ':'')+title).trim();
+    return ('تقرير تنفيذ '+(kind?kind+' ':'')+title).trim();
+  }
+
+  function evidenceTitleImage(d,type){
+    const title=String((d&&d.program)||'').trim()||'........................';
+    const kind=String(type||'').trim();
+    const style=selectedReportTitleStyleImage(d);
+    if(style==='titleOnly') return ('شواهد '+title).trim();
+    if(style==='withoutExecution') return ('شواهد '+(kind?kind+' ':'')+title).trim();
+    return ('شواهد تنفيذ '+(kind?kind+' ':'')+title).trim();
   }
 
   function selectedApprovalEntitiesImage(){
@@ -237,7 +260,8 @@
     const tr1=document.createElement('tr');
     tr1.className='ipr-meta';
     const dateLabel=String(d.dateLabel||'تاريخ التنفيذ');
-    tr1.innerHTML=`<th>اسم ${esc(type)}</th><td>${esc(d.program||'')}</td><th>${esc(dateLabel)}</th><td style="text-align:center">${esc(d.date||'')}</td>`;
+    const titleLabel=type?'اسم '+type:'عنوان التقرير';
+    tr1.innerHTML=`<th>${esc(titleLabel)}</th><td>${esc(d.program||'')}</td><th>${esc(dateLabel)}</th><td style="text-align:center">${esc(d.date||'')}</td>`;
     tbody.appendChild(tr1);
     const tr2=document.createElement('tr');
     tr2.className='ipr-meta';
@@ -330,7 +354,7 @@
     if(!s)return s;
     let patterns=[];
     if(kind==='goal'){
-      patterns=['الهدف من '+type,'الهدف من البرنامج','الهدف من المبادرة','الهدف من الورشة','الهدف'];
+      patterns=[...(type?['الهدف من '+type]:[]),'الهدف من البرنامج','الهدف من المبادرة','الهدف من الورشة','الهدف'];
     }else if(kind==='steps'){
       patterns=['إجراءات التنفيذ','اجراءات التنفيذ','الإجراءات','الاجراءات','إجراءات','اجراءات'];
     }else if(kind==='results'){
@@ -347,9 +371,10 @@
 
   function buildReportPages(root,d){
     const type=selectedReportTypeImage();
-    const baseTitle='تقرير تنفيذ '+type+' '+(d.program||'........................');
+    const baseTitle=reportTitleImage(d,type);
+    const goalLabel=type?'الهدف من '+type:'الهدف';
     const sections=[
-      {label:'الهدف من '+type,text:cleanRepeatedSectionHeadingImage(d.goal,'goal',type)},
+      {label:goalLabel,text:cleanRepeatedSectionHeadingImage(d.goal,'goal',type)},
       {label:'إجراءات التنفيذ',text:cleanRepeatedSectionHeadingImage(d.steps,'steps',type)},
       {label:'المخرجات وقياس الأثر',text:cleanRepeatedSectionHeadingImage(d.results,'results',type)}
     ];
@@ -456,8 +481,8 @@
           ${selectedSchoolHeaderHtmlImage()}
         </div>
         <div class="ipr-line"></div>
-        <div class="ipr-e-title">شواهد تنفيذ ${esc(type)}</div>
-        <div class="ipr-e-sub">${esc(d.program||'........................')} &nbsp;&nbsp; ${esc(d.date||'')}</div>
+        <div class="ipr-e-title">${esc(evidenceTitleImage(d,type))}</div>
+        <div class="ipr-e-sub">${esc(d.date||'')}</div>
         <div class="ipr-grid">${cards}</div>
         <div class="ipr-e-signline"></div>
         <div class="ipr-bottom"></div>
