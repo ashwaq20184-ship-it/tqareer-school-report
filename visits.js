@@ -197,13 +197,23 @@ function drawInfoTable(ctx,data){
   fitBoxText(ctx,data.lessonTopic,49,294,391,51,{size:13,min:9,weight:500});
 }
 function drawEvalHeaders(ctx){
-  const xs=[50,89,128,167,311,350,395,552.5,592.5,631.5,788.5], y0=374,y1=414,y2=448.5;
-  rect(ctx,50,y0,117,y1-y0,COLORS.pale);rect(ctx,167,y0,228,y1-y0,COLORS.pale);rect(ctx,395,y0,157.5,y1-y0,COLORS.pale);rect(ctx,552.5,y0,79,y1-y0,COLORS.pale);rect(ctx,631.5,y0,157,y1-y0,COLORS.pale);
+  const y0=374,y1=414,y2=448.5;
+  rect(ctx,50,y0,117,y1-y0,COLORS.pale);
+  rect(ctx,167,y0,144,y1-y0,COLORS.pale);
+  rect(ctx,311,y0,84,y1-y0,COLORS.pale);
+  rect(ctx,395,y0,157.5,y2-y0,COLORS.pale);
+  rect(ctx,552.5,y0,79,y1-y0,COLORS.pale);
+  rect(ctx,631.5,y0,157,y2-y0,COLORS.pale);
   centerText(ctx,'مستوى التحقق',50,y0,117,y1-y0,13,COLORS.red,700);
-  fitBoxText(ctx,'مؤشرات متابعة سلوك المتعلمين أثناء الدرس',167,y0,228,y1-y0,{size:13,min:10,color:COLORS.red,weight:700});
-  centerText(ctx,'مستوى التنفيذ',395,y0,157.5,y1-y0,13,COLORS.red,700);centerText(ctx,'العنصر',552.5,y0,79,y1-y0,14,COLORS.red,700);
-  centerText(ctx,'مستوى التنفيذ',631.5,y0,157,y1-y0,13,COLORS.red,700);centerText(ctx,'العنصر',788.5-157,y0,157,y1-y0,14,COLORS.red,700);
-  for(let i=0;i<10;i++)rect(ctx,xs[i],y1,xs[i+1]-xs[i],y2-y1,i===3||i===6||i===9?COLORS.pale:COLORS.pale);
+  fitBoxText(ctx,'مؤشرات متابعة سلوك المتعلمين أثناء الدرس',167,y0,144,y1-y0,{size:12,min:9,color:COLORS.red,weight:700});
+  centerText(ctx,'مستوى التنفيذ',311,y0,84,y1-y0,12,COLORS.red,700);
+  centerText(ctx,'العنصر',395,y0,157.5,y2-y0,15,COLORS.red,700);
+  centerText(ctx,'مستوى التنفيذ',552.5,y0,79,y1-y0,12,COLORS.red,700);
+  centerText(ctx,'العنصر',631.5,y0,157,y2-y0,15,COLORS.red,700);
+  rect(ctx,50,y1,39,y2-y1,COLORS.pale);rect(ctx,89,y1,39,y2-y1,COLORS.pale);rect(ctx,128,y1,39,y2-y1,COLORS.pale);
+  rect(ctx,167,y1,144,y2-y1,COLORS.pale);
+  rect(ctx,311,y1,39,y2-y1,COLORS.pale);rect(ctx,350,y1,45,y2-y1,COLORS.pale);
+  rect(ctx,552.5,y1,40,y2-y1,COLORS.pale);rect(ctx,592.5,y1,39,y2-y1,COLORS.pale);
   fitBoxText(ctx,'غير متحقق',50,y1,39,y2-y1,{size:9,min:7,color:COLORS.red,weight:700});
   fitBoxText(ctx,'متحقق جزئيًا',89,y1,39,y2-y1,{size:9,min:7,color:COLORS.red,weight:700});
   fitBoxText(ctx,'متحقق',128,y1,39,y2-y1,{size:9,min:7,color:COLORS.red,weight:700});
@@ -218,7 +228,7 @@ function drawEvaluation(ctx,data){
   const ys=[448.5,506.5,583.5,680,757.5,835,912.5,990.5,1029.5];
   drawEvalHeaders(ctx);
   // vertical and row cells
-  for(let r=0;r<8;r++){
+  for(let r=0;r<7;r++){
     const y=ys[r],h=ys[r+1]-ys[r];
     for(let c=0;c<10;c++)rect(ctx,xs[c],y,xs[c+1]-xs[c],h,'#fff');
     if(r<6)fitBoxText(ctx,behaviorCriteria[r],167,y,144,h,{size:17,min:11,weight:700});
@@ -233,8 +243,11 @@ function drawEvaluation(ctx,data){
   }
   // final partial row lives at bottom and continues on page 2
   const y=ys[7],h=ys[8]-ys[7];
+  for(let c=0;c<10;c++)rect(ctx,xs[c],y,xs[c+1]-xs[c],h,'#fff');
   fitBoxText(ctx,'تنوع الأنشطة التعليمية بما',395,y,157.5,h,{size:15,min:10,weight:700});
-  fitBoxText(ctx,'الالتزام بزمن الحصة',631.5,y,157,h,{size:15,min:10,weight:700});
+  fitBoxText(ctx,'الالتزام بزمن',631.5,y,157,h,{size:15,min:10,weight:700});
+  const m7=data.ratings.middle7;if(m7==='not')drawCheck(ctx,311,y,39,h);if(m7==='ok')drawCheck(ctx,350,y,45,h);
+  const r7=data.ratings.right7;if(r7==='not')drawCheck(ctx,552.5,y,40,h);if(r7==='ok')drawCheck(ctx,592.5,y,39,h);
 }
 function drawPage1(ctx,data){
   ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctxBase(ctx);drawHeader(ctx);
@@ -265,7 +278,7 @@ function drawPage2(ctx,data){
   rect(ctx,239,362,238,27,'#fff');rect(ctx,477,362,121,27,COLORS.pale);centerText(ctx,'الاسم',477,362,121,27,14,COLORS.red,700);
   rect(ctx,239,389,238,27,'#fff');rect(ctx,477,389,121,27,COLORS.pale);centerText(ctx,'التوقيع',477,389,121,27,14,COLORS.red,700);
   fitBoxText(ctx,data.visitorName,239,362,238,27,{size:13,min:9,weight:500});
-  if(data.signature){const im=new Image();im.onload=()=>{ctx.drawImage(im,244,392,228,21)};im.src=data.signature}
+  if(data.signature&&$('signatureCanvas'))ctx.drawImage($('signatureCanvas'),244,392,228,21)
   drawFooter(ctx);
 }
 function renderPreview(){
@@ -283,8 +296,6 @@ async function exportPdf(){
   const data=currentData(),doc=await PDFLib.PDFDocument.create();
   for(const n of [1,2]){
     const c=makePageCanvas(n,data,2);
-    // signature image needs one frame if present
-    if(n===2&&data.signature)await new Promise(r=>setTimeout(r,40));
     const png=await doc.embedPng(c.toDataURL('image/png'));
     const p=doc.addPage([595.28,841.89]);p.drawImage(png,{x:0,y:0,width:595.28,height:841.89});
   }
