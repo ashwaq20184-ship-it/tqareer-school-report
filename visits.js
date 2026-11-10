@@ -44,8 +44,9 @@ function notice(msg,error=false){
 }
 function field(id){return String(($(id)&&$(id).value)||'').trim()}
 function currentData(){
-  const fields={}; fieldIds.forEach(id=>fields[id]=field(id));
-  return {fields,ratings:{...ratings},signature:signatureData()};
+  const data={ratings:{...ratings},signature:signatureData()};
+  fieldIds.forEach(id=>data[id]=field(id));
+  return data;
 }
 function save(show=true){
   try{localStorage.setItem(KEY,JSON.stringify(currentData())); if(show)notice('تم حفظ بيانات الزيارة على هذا الجهاز.')}
@@ -53,10 +54,25 @@ function save(show=true){
 }
 function load(){
   try{
-    const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(!s)return;
-    fieldIds.forEach(id=>{if($(id)&&s.fields&&Object.prototype.hasOwnProperty.call(s.fields,id))$(id).value=s.fields[id]||''});
+    let s=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(!s){
+      // دعم النسخة السابقة حتى لا تضيع البيانات المحفوظة قبل هذا الإصلاح.
+      s=JSON.parse(localStorage.getItem('exchangeVisitsStandaloneV1')||'null');
+    }
+    if(!s)return;
+
+    const legacyFields=s.fields&&typeof s.fields==='object'?s.fields:null;
+    fieldIds.forEach(id=>{
+      if(!$(id))return;
+      if(Object.prototype.hasOwnProperty.call(s,id))$(id).value=s[id]||'';
+      else if(legacyFields&&Object.prototype.hasOwnProperty.call(legacyFields,id))$(id).value=legacyFields[id]||'';
+    });
+
     if(s.ratings)Object.entries(s.ratings).forEach(([g,v])=>setRating(g,v,false));
     if(s.signature)restoreSignature(s.signature);
+
+    // ترحيل البيانات القديمة تلقائيًا إلى البنية الجديدة.
+    localStorage.setItem(KEY,JSON.stringify(currentData()));
   }catch(e){}
 }
 function clearAll(){
