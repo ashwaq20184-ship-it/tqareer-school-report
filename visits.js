@@ -1,0 +1,27 @@
+(function(){
+'use strict';
+const KEY='exchangeVisitsStandaloneV1';
+const $=id=>document.getElementById(id);
+const fieldIds=['hostTeacher','className','subjectName','periodName','visitDay','visitDate','lessonTopic','teachingStrategies','learnedPractices','visitorName'];
+const ratings={};
+function notice(msg,error){const n=$('notice');if(!n)return;n.textContent=msg;n.style.color=error?'#a52525':'#157268'}
+function setRating(group,value,toggle){const current=ratings[group]||'';const next=toggle&&current===value?'':value;ratings[group]=next;document.querySelectorAll('.rating[data-group="'+group+'"]').forEach(b=>b.classList.toggle('selected',b.dataset.value===next))}
+function initRatings(){document.querySelectorAll('.rating[data-group]').forEach(b=>b.addEventListener('click',()=>setRating(b.dataset.group,b.dataset.value,true)))}
+const sig=$('signatureCanvas');let ctx=null,drawing=false,last=null;
+function setupSignature(){if(!sig)return;sig.width=1000;sig.height=170;ctx=sig.getContext('2d');ctx.strokeStyle='#111';ctx.lineWidth=4;ctx.lineCap='round';ctx.lineJoin='round';const point=e=>{const r=sig.getBoundingClientRect();return{x:(e.clientX-r.left)*sig.width/r.width,y:(e.clientY-r.top)*sig.height/r.height}};sig.addEventListener('pointerdown',e=>{e.preventDefault();drawing=true;last=point(e);sig.setPointerCapture&&sig.setPointerCapture(e.pointerId)});sig.addEventListener('pointermove',e=>{if(!drawing)return;e.preventDefault();const p=point(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p});const stop=e=>{if(!drawing)return;drawing=false;last=null;try{sig.releasePointerCapture&&sig.releasePointerCapture(e.pointerId)}catch(_){}};sig.addEventListener('pointerup',stop);sig.addEventListener('pointercancel',stop)}
+function clearSignature(){if(ctx)ctx.clearRect(0,0,sig.width,sig.height)}
+function signatureData(){if(!sig||!ctx)return'';const d=ctx.getImageData(0,0,sig.width,sig.height).data;let has=false;for(let i=3;i<d.length;i+=4){if(d[i]){has=true;break}}return has?sig.toDataURL('image/png'):''}
+function restoreSignature(data){clearSignature();if(!data||!ctx)return;const im=new Image();im.onload=()=>ctx.drawImage(im,0,0,sig.width,sig.height);im.src=data}
+function state(){const fields={};fieldIds.forEach(id=>fields[id]=($(id)&&$(id).value)||'');return{fields,ratings:{...ratings},signature:signatureData()}}
+function applyState(s){if(!s)return;fieldIds.forEach(id=>{if($(id)&&s.fields&&Object.prototype.hasOwnProperty.call(s.fields,id))$(id).value=s.fields[id]||''});if(s.ratings)Object.entries(s.ratings).forEach(([g,v])=>setRating(g,v,false));if(s.signature)restoreSignature(s.signature)}
+function save(show=true){try{localStorage.setItem(KEY,JSON.stringify(state()));if(show)notice('تم حفظ بيانات الزيارة على هذا الجهاز.')}catch(e){notice('تعذر حفظ البيانات على الجهاز.',true)}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s)applyState(s)}catch(e){}}
+function clearAll(){fieldIds.forEach(id=>{if($(id))$(id).value=''});Object.keys(ratings).forEach(g=>setRating(g,'',false));clearSignature();localStorage.removeItem(KEY);notice('تم مسح بيانات الزيارة فقط.')}
+function waitImages(){return Promise.all([...document.querySelectorAll('.paper img')].map(im=>im.complete?Promise.resolve():new Promise(r=>{im.onload=r;im.onerror=r})))}
+async function exportPdf(){if(!window.html2canvas||!window.PDFLib)throw new Error('تعذر تحميل محرك PDF. تحققي من الاتصال بالإنترنت.');const pages=[$('page1'),$('page2')];document.activeElement&&document.activeElement.blur&&document.activeElement.blur();pages.forEach(p=>p.classList.add('exporting'));try{await waitImages();if(document.fonts&&document.fonts.ready)await document.fonts.ready;const doc=await PDFLib.PDFDocument.create();for(const p of pages){const canvas=await html2canvas(p,{backgroundColor:'#fff',scale:2,useCORS:true,allowTaint:false,logging:false,width:827,height:1170,windowWidth:827,windowHeight:1170});const png=canvas.toDataURL('image/png');const img=await doc.embedPng(png);const page=doc.addPage([595.28,841.89]);page.drawImage(img,{x:0,y:0,width:595.28,height:841.89})}doc.setTitle('زيارة متبادلة');doc.setCreator('متوسطة جميلة بنت عمر بن الخطاب');const bytes=await doc.save();const blob=new Blob([bytes],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='زيارة-متبادلة.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}finally{pages.forEach(p=>p.classList.remove('exporting'))}}
+initRatings();setupSignature();load();
+$('saveBtn').addEventListener('click',()=>save(true));
+$('clearBtn').addEventListener('click',()=>{if(confirm('هل تريدين مسح جميع بيانات الزيارة الحالية؟'))clearAll()});
+$('clearSignatureBtn').addEventListener('click',()=>{clearSignature();notice('تم مسح التوقيع.')});
+$('pdfBtn').addEventListener('click',async()=>{const b=$('pdfBtn'),old=b.textContent;b.disabled=true;b.textContent='جارٍ إنشاء PDF...';notice('جارٍ تجهيز النموذج...');try{save(false);await exportPdf();notice('تم إنشاء ملف PDF بنجاح.')}catch(e){console.error(e);notice(e.message||'تعذر إنشاء ملف PDF.',true)}finally{b.disabled=false;b.textContent=old}});
+})();
