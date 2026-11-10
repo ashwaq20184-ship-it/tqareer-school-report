@@ -117,3 +117,4 @@ textarea{resize:vertical;line-height:1.6}
   .preview-stage{padding:0;background:#fff;max-height:none}
   .preview-stage canvas{width:210mm;height:297mm;box-shadow:none;page-break-after:always}
 }
+.page-switch{display:none!important}
