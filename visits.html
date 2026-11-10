@@ -10,120 +10,88 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="visits.css?v=20261110-2">
+  <link rel="stylesheet" href="visits.css?v=20261110-4">
 </head>
 <body>
-<header class="appbar">
-  <div class="app-title"><strong>الزيارات التبادلية</strong><span>النموذج المعتمد – تعبئة إلكترونية مستقلة</span></div>
-  <div class="app-actions">
-    <a class="btn secondary" href="index.html">صانع التقارير</a>
-    <button class="btn secondary" id="saveBtn" type="button">حفظ البيانات</button>
-    <button class="btn danger" id="clearBtn" type="button">مسح الحقول</button>
-    <button class="btn primary" id="pdfBtn" type="button">تحميل PDF</button>
+<header class="top-nav">
+  <div>
+    <div class="eyebrow">النموذج المعتمد</div>
+    <h1>الزيارات التبادلية</h1>
+    <p>تعبئة إلكترونية مع معاينة مطابقة لشكل التقرير النهائي.</p>
   </div>
+  <a class="link-btn" href="index.html">العودة إلى صانع التقارير</a>
 </header>
-<main class="main">
-  <div class="helper">اضغطي داخل خلية التقييم المناسبة لإضافة علامة ✓. بيانات هذه الصفحة تحفظ منفصلة تمامًا عن صانع التقارير.</div>
 
-  <section class="page-shell">
-    <div class="paper" id="page1">
-      <div class="topbar"></div><div class="bottombar"></div>
-      <img class="moe-logo" src="moe-logo.svg?v=20260920-1" alt="وزارة التعليم">
-      <div class="official-head">المملكة العربية السعودية<br>وزارة التعليم<br>إدارة التعليم بمحافظة ينبع<br>متوسطة جميلة بنت عمر بن الخطاب<br>المتوسطة الأولى لتعليم الكبيرات</div>
-      <div class="tool-title">أداة ملاحظة</div>
-      <div class="visit-title">زيارة متبادلة <span class="red-square"></span></div>
-
-      <div class="info-grid">
-        <div class="info-label host-label">اسم المعلمة<br>المضيفة</div><input id="hostTeacher" class="info-input host-input" autocomplete="off">
-        <div class="info-label class-label">الصف</div><input id="className" class="info-input class-input" autocomplete="off">
-        <div class="info-label subject-label">المادة</div><input id="subjectName" class="info-input subject-input" autocomplete="off">
-        <div class="info-label period-label">الحصة</div><input id="periodName" class="info-input period-input" autocomplete="off">
-        <div class="info-label day-label">اليوم</div><input id="visitDay" class="info-input day-input" autocomplete="off">
-        <div class="info-label date-label">التاريخ</div><input id="visitDate" class="info-input date-input" autocomplete="off" inputmode="numeric">
-        <div class="info-label lesson-label">موضوع<br>الدرس</div><textarea id="lessonTopic" class="info-input lesson-input"></textarea>
+<main class="workspace">
+  <section class="editor">
+    <div class="panel">
+      <div class="panel-head"><span class="step">1</span><div><h2>بيانات الزيارة</h2><p>تظهر البيانات في خانات النموذج الأصلية.</p></div></div>
+      <div class="form-grid">
+        <label><span>اسم المعلمة المضيفة</span><input id="hostTeacher" autocomplete="off"></label>
+        <label><span>الصف</span><input id="className" autocomplete="off"></label>
+        <label><span>المادة</span><input id="subjectName" autocomplete="off"></label>
+        <label><span>الحصة</span><input id="periodName" autocomplete="off"></label>
+        <label><span>اليوم</span><input id="visitDay" autocomplete="off"></label>
+        <label><span>التاريخ</span><input id="visitDate" autocomplete="off" inputmode="numeric" placeholder="هجري"></label>
+        <label class="wide"><span>موضوع الدرس</span><textarea id="lessonTopic" rows="2"></textarea></label>
       </div>
-
-      <div class="eval-title">عناصر تقويم الدرس</div>
-      <div class="eval-grid" id="evalGrid">
-        <div class="h1 left-check" style="grid-column:1/4">مستوى<br>التحقق</div>
-        <div class="h1 left-behavior" style="grid-column:4">مؤشرات متابعة سلوك المتعلمين أثناء الدرس</div>
-        <div class="h1 mid-level" style="grid-column:5/7">مستوى<br>التنفيذ</div>
-        <div class="h1 mid-element" style="grid-column:7">العنصر</div>
-        <div class="h1 right-level" style="grid-column:8/10">مستوى<br>التنفيذ</div>
-        <div class="h1 right-element" style="grid-column:10">العنصر</div>
-
-        <div class="h2" style="grid-column:1">غير<br>متحقق</div><div class="h2" style="grid-column:2">متحقق<br>جزئيًا</div><div class="h2" style="grid-column:3">متحقق</div><div class="h2 behavior-caption" style="grid-column:4">العنصر</div>
-        <div class="h2" style="grid-column:5">غير<br>مناسب</div><div class="h2" style="grid-column:6">مناسب</div><div class="h2 blank" style="grid-column:7"></div>
-        <div class="h2" style="grid-column:8">غير<br>مناسب</div><div class="h2" style="grid-column:9">مناسب</div><div class="h2 blank" style="grid-column:10"></div>
-
-        <button class="rating" data-group="behavior0" data-value="no"></button><button class="rating" data-group="behavior0" data-value="partial"></button><button class="rating" data-group="behavior0" data-value="yes"></button><div class="criterion behavior">الانضباط والهدوء أثناء شرح المعلمة</div>
-        <button class="rating" data-group="middle0" data-value="not"></button><button class="rating" data-group="middle0" data-value="ok"></button><div class="criterion">مراعاة الأنشطة للفروق الفردية للمتعلمين</div>
-        <button class="rating" data-group="right0" data-value="not"></button><button class="rating" data-group="right0" data-value="ok"></button><div class="criterion">التهيئة للدرس بأسلوب مشوق</div>
-
-        <button class="rating" data-group="behavior1" data-value="no"></button><button class="rating" data-group="behavior1" data-value="partial"></button><button class="rating" data-group="behavior1" data-value="yes"></button><div class="criterion behavior">الالتزام بآداب الحوار والاستئذان قبل الحديث</div>
-        <button class="rating" data-group="middle1" data-value="not"></button><button class="rating" data-group="middle1" data-value="ok"></button><div class="criterion">إثارة الدافعية لدى المتعلمين وتعزيز إجاباتهم</div>
-        <button class="rating" data-group="right1" data-value="not"></button><button class="rating" data-group="right1" data-value="ok"></button><div class="criterion">توظيف الوسائل التعليمية المناسبة للدرس</div>
-
-        <button class="rating" data-group="behavior2" data-value="no"></button><button class="rating" data-group="behavior2" data-value="partial"></button><button class="rating" data-group="behavior2" data-value="yes"></button><div class="criterion behavior">المشاركة الإيجابية والتفاعل مع الأنشطة الصفية</div>
-        <button class="rating" data-group="middle2" data-value="not"></button><button class="rating" data-group="middle2" data-value="ok"></button><div class="criterion">التغذية الراجعة الفورية أثناء الموقف التعليمية</div>
-        <button class="rating" data-group="right2" data-value="not"></button><button class="rating" data-group="right2" data-value="ok"></button><div class="criterion">العناية بصياغة الأهداف السلوكية وتحقيقها</div>
-
-        <button class="rating" data-group="behavior3" data-value="no"></button><button class="rating" data-group="behavior3" data-value="partial"></button><button class="rating" data-group="behavior3" data-value="yes"></button><div class="criterion behavior">التعاون مع الزميلات أثناء التعلم والعمل الجماعي</div>
-        <button class="rating" data-group="middle3" data-value="not"></button><button class="rating" data-group="middle3" data-value="ok"></button><div class="criterion">إدارة الصفية بأسلوب تربوي فاعل</div>
-        <button class="rating" data-group="right3" data-value="not"></button><button class="rating" data-group="right3" data-value="ok"></button><div class="criterion">تنوع المصادر الرقمية المستخدمة في التعلم</div>
-
-        <button class="rating" data-group="behavior4" data-value="no"></button><button class="rating" data-group="behavior4" data-value="partial"></button><button class="rating" data-group="behavior4" data-value="yes"></button><div class="criterion behavior">المحافظة على الممتلكات والتجهيزات الصفية</div>
-        <button class="rating" data-group="middle4" data-value="not"></button><button class="rating" data-group="middle4" data-value="ok"></button><div class="criterion">تعزيز العلاقات الإيجابية والتعاون بين المتعلمين</div>
-        <button class="rating" data-group="right4" data-value="not"></button><button class="rating" data-group="right4" data-value="ok"></button><div class="criterion">التسلسل المنطقي في عرض الدرس</div>
-
-        <button class="rating" data-group="behavior5" data-value="no"></button><button class="rating" data-group="behavior5" data-value="partial"></button><button class="rating" data-group="behavior5" data-value="yes"></button><div class="criterion behavior">تجنب السلوكيات المشتتة لسير الدرس</div>
-        <button class="rating" data-group="middle5" data-value="not"></button><button class="rating" data-group="middle5" data-value="ok"></button><div class="criterion">المشاركة الفاعلة للمتعلمين أثناء التعلم</div>
-        <button class="rating" data-group="right5" data-value="not"></button><button class="rating" data-group="right5" data-value="ok"></button><div class="criterion">تنوع أساليب التقويم وأدواته</div>
-
-        <div class="rating disabled"></div><div class="rating disabled"></div><div class="rating disabled"></div><div class="criterion behavior empty"></div>
-        <button class="rating" data-group="middle6" data-value="not"></button><button class="rating" data-group="middle6" data-value="ok"></button><div class="criterion">مناسبة استراتيجيات التدريس لطبيعة ناتج التعلم</div>
-        <button class="rating" data-group="right6" data-value="not"></button><button class="rating" data-group="right6" data-value="ok"></button><div class="criterion">ربط الدرس بالحياة اليومية</div>
-
-        <div class="rating disabled"></div><div class="rating disabled"></div><div class="rating disabled"></div><div class="criterion behavior empty"></div>
-        <button class="rating" data-group="middle7" data-value="not"></button><button class="rating" data-group="middle7" data-value="ok"></button><div class="criterion partial-text">تنوع الأنشطة التعليمية بما</div>
-        <button class="rating" data-group="right7" data-value="not"></button><button class="rating" data-group="right7" data-value="ok"></button><div class="criterion partial-text">الالتزام بزمن</div>
-      </div>
-
-      <div class="prepared p1"><span>معدة التقرير :</span><strong>فاطمة مصطفى الجهني<br>الغامدي</strong></div>
-      <div class="manager p1"><span>مديرة<br>المدرسة :</span><strong>حنان<br>الغامدي</strong></div>
     </div>
+
+    <div class="panel">
+      <div class="panel-head"><span class="step">2</span><div><h2>عناصر تقويم الدرس</h2><p>اختاري مستوى واحدًا لكل عنصر. يمكن الضغط على الاختيار نفسه لإلغائه.</p></div></div>
+
+      <details open class="eval-section">
+        <summary>أداء المعلمة – عناصر الدرس</summary>
+        <div id="rightCriteria" class="criteria-list"></div>
+      </details>
+
+      <details open class="eval-section">
+        <summary>أداء المعلمة – التنفيذ والتفاعل</summary>
+        <div id="middleCriteria" class="criteria-list"></div>
+      </details>
+
+      <details open class="eval-section">
+        <summary>مؤشرات متابعة سلوك المتعلمين</summary>
+        <div id="behaviorCriteria" class="criteria-list"></div>
+      </details>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><span class="step">3</span><div><h2>خلاصة الزيارة</h2><p>تظهر في الصفحة الثانية من النموذج.</p></div></div>
+      <label class="stack"><span>استراتيجيات التدريس المنفذة</span><textarea id="teachingStrategies" rows="3"></textarea></label>
+      <label class="stack"><span>الممارسات التدريسية المكتسبة</span><textarea id="learnedPractices" rows="3"></textarea></label>
+      <label class="stack"><span>اسم المعلمة الزائرة</span><input id="visitorName" autocomplete="off"></label>
+      <div class="signature-wrap">
+        <div class="signature-title"><span>توقيع الزائرة</span><button id="clearSignatureBtn" class="text-btn" type="button">مسح التوقيع</button></div>
+        <canvas id="signatureCanvas" width="900" height="220"></canvas>
+        <small>استخدمي الإصبع أو الماوس للرسم داخل المربع.</small>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" id="saveBtn" type="button">حفظ البيانات</button>
+      <button class="btn danger" id="clearBtn" type="button">مسح الحقول</button>
+      <button class="btn primary" id="pdfBtn" type="button">تحميل PDF النهائي</button>
+    </div>
+    <div id="notice" class="notice" role="status" aria-live="polite"></div>
   </section>
 
-  <section class="page-shell">
-    <div class="paper" id="page2">
-      <div class="topbar"></div><div class="bottombar"></div>
-      <img class="moe-logo" src="moe-logo.svg?v=20260920-1" alt="وزارة التعليم">
-      <div class="official-head">المملكة العربية السعودية<br>وزارة التعليم<br>إدارة التعليم بمحافظة ينبع<br>متوسطة جميلة بنت عمر بن الخطاب<br>المتوسطة الأولى لتعليم الكبيرات</div>
-
-      <div class="continuation-grid">
-        <div></div><div></div><div class="cont-text">التعليمية بما<br>يتناسب مع نواتج<br>التعلم المستهدفة</div><div></div><div></div><div class="cont-text">الحصة</div>
+  <aside class="preview">
+    <div class="preview-head">
+      <div><strong>المعاينة النهائية</strong><span>نفس الرسم المستخدم داخل ملف PDF</span></div>
+      <div class="page-switch">
+        <button type="button" data-page="1" class="active">1</button>
+        <button type="button" data-page="2">2</button>
       </div>
-
-      <div class="section-title strategies-title">استراتيجيات التدريس المنفذة</div>
-      <textarea id="teachingStrategies" class="lined-input strategies-input"></textarea>
-      <div class="section-title practices-title">الممارسات التدريسية المكتسبة</div>
-      <textarea id="learnedPractices" class="lined-input practices-input"></textarea>
-
-      <div class="visitor-box">
-        <div class="visitor-head">الزائرة</div><div class="visitor-label">الاسم</div><input id="visitorName" class="visitor-input" autocomplete="off">
-        <div class="visitor-label">التوقيع</div><canvas id="signatureCanvas" class="signature-canvas"></canvas>
-      </div>
-
-      <div class="prepared p2"><span>معدة التقرير :</span><strong>فاطمة مصطفى الجهني<br>الغامدي</strong></div>
-      <div class="manager p2"><span>مديرة<br>المدرسة :</span><strong>حنان<br>الغامدي</strong></div>
     </div>
-  </section>
-
-  <div class="signature-help"><span>ارسمي التوقيع داخل خانة «التوقيع» في الصفحة الثانية.</span><button class="btn secondary small" id="clearSignatureBtn" type="button">مسح التوقيع</button></div>
-  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+    <div class="preview-stage">
+      <canvas id="preview1" width="827" height="1170"></canvas>
+      <canvas id="preview2" width="827" height="1170" hidden></canvas>
+    </div>
+  </aside>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<script src="visits.js?v=20261110-3"></script>
+<script src="visits.js?v=20261110-4"></script>
 </body>
 </html>
