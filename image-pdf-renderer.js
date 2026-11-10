@@ -118,6 +118,12 @@
         manager
       ];
     }
+    if(v === 'counseling'){
+      return [
+        {label:'الإرشاد الطلابي',name:'زينب الرفاعي - وضحى القحطاني'},
+        manager
+      ];
+    }
     if(v === 'none'){
       return [manager];
     }
@@ -372,7 +378,7 @@
   function buildReportPages(root,d){
     const type=selectedReportTypeImage();
     const baseTitle=reportTitleImage(d,type);
-    const goalLabel=type?'الهدف من '+type:'الهدف';
+    const goalLabel='الهدف';
     const sections=[
       {label:goalLabel,text:cleanRepeatedSectionHeadingImage(d.goal,'goal',type)},
       {label:'إجراءات التنفيذ',text:cleanRepeatedSectionHeadingImage(d.steps,'steps',type)},
