@@ -176,23 +176,27 @@ function drawHeader(ctx){
     .forEach((s,i)=>ctx.fillText(s,788,52+i*16));
 }
 function drawFooter(ctx){
-  ctx.textBaseline='top';
+  ctx.textBaseline='middle';
+  ctx.textAlign='center';
 
-  ctx.textAlign='right';font(ctx,12.5,700,'Tahoma');ctx.fillStyle=COLORS.soft;
-  ctx.fillText('معدة التقرير :',787,1052);
-  ctx.fillText('المدرسة :',787,1068);
-  ctx.fillStyle='#050505';font(ctx,13.5,400,'Tahoma');
-  ctx.fillText('فاطمة مصطفى الجهني',787,1090);
-  ctx.fillText('الغامدي',787,1108);
+  // عمود الاعتماد الأيمن: معدة التقرير
+  ctx.fillStyle=COLORS.soft;
+  font(ctx,13.5,700,'Tahoma');
+  ctx.fillText('معدة التقرير',650,1068);
+  ctx.fillStyle='#050505';
+  font(ctx,14.5,500,'Tahoma');
+  ctx.fillText('فاطمة مصطفى الجهني',650,1094);
+  line(ctx,560,1118,740,1118,'#777',1);
 
-  ctx.textAlign='left';font(ctx,12.5,700,'Tahoma');ctx.fillStyle=COLORS.soft;
-  ctx.fillText('مديرة',58,1052);
-  ctx.fillText('المدرسة :',58,1068);
-  ctx.fillStyle='#050505';font(ctx,13.5,400,'Tahoma');
-  ctx.fillText('حنان',58,1090);
-  ctx.fillText('الغامدي',58,1108);
+  // عمود الاعتماد الأيسر: مديرة المدرسة
+  ctx.fillStyle=COLORS.soft;
+  font(ctx,13.5,700,'Tahoma');
+  ctx.fillText('مديرة المدرسة',177,1068);
+  ctx.fillStyle='#050505';
+  font(ctx,14.5,500,'Tahoma');
+  ctx.fillText('حنان الغامدي',177,1094);
+  line(ctx,87,1118,267,1118,'#777',1);
 
-  line(ctx,49,1037,89,1037,'#111',1.4);
   drawGradientBar(ctx,1142,28);
 }
 function drawInfoTable(ctx,data){
