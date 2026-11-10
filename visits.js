@@ -160,12 +160,23 @@ function drawHeader(ctx){
     .forEach((s,i)=>ctx.fillText(s,788,52+i*16));
 }
 function drawFooter(ctx){
-  ctx.textAlign='right';ctx.textBaseline='top';font(ctx,13,700,'Tahoma');ctx.fillStyle=COLORS.soft;
-  ctx.fillText('معدة التقرير :',787,1058);ctx.fillText('المدرسة :',787,1075);
-  ctx.fillStyle='#050505';font(ctx,14,400,'Tahoma');ctx.fillText('فاطمة مصطفى الجهني',787,1098);ctx.fillText('الغامدي',787,1117);
-  ctx.textAlign='left';font(ctx,13,700,'Tahoma');ctx.fillStyle=COLORS.soft;ctx.fillText('مديرة',58,1058);
-  ctx.fillStyle='#050505';font(ctx,14,400,'Tahoma');ctx.fillText('حنان',58,1098);
-  line(ctx,49,1038,89,1038,'#111',1.5);
+  ctx.textBaseline='top';
+
+  ctx.textAlign='right';font(ctx,12.5,700,'Tahoma');ctx.fillStyle=COLORS.soft;
+  ctx.fillText('معدة التقرير :',787,1052);
+  ctx.fillText('المدرسة :',787,1068);
+  ctx.fillStyle='#050505';font(ctx,13.5,400,'Tahoma');
+  ctx.fillText('فاطمة مصطفى الجهني',787,1090);
+  ctx.fillText('الغامدي',787,1108);
+
+  ctx.textAlign='left';font(ctx,12.5,700,'Tahoma');ctx.fillStyle=COLORS.soft;
+  ctx.fillText('مديرة',58,1052);
+  ctx.fillText('المدرسة :',58,1068);
+  ctx.fillStyle='#050505';font(ctx,13.5,400,'Tahoma');
+  ctx.fillText('حنان',58,1090);
+  ctx.fillText('الغامدي',58,1108);
+
+  line(ctx,49,1037,89,1037,'#111',1.4);
   drawGradientBar(ctx,1142,28);
 }
 function drawInfoTable(ctx,data){
@@ -197,134 +208,168 @@ function drawInfoTable(ctx,data){
   fitBoxText(ctx,data.lessonTopic,49,294,391,51,{size:13,min:9,weight:500});
 }
 function drawEvalHeaders(ctx){
-  const y0=374,y1=414,y2=448.5;
+  const y0=374,y1=406,y2=432;
   rect(ctx,50,y0,117,y1-y0,COLORS.pale);
   rect(ctx,167,y0,144,y1-y0,COLORS.pale);
   rect(ctx,311,y0,84,y1-y0,COLORS.pale);
   rect(ctx,395,y0,157.5,y2-y0,COLORS.pale);
   rect(ctx,552.5,y0,79,y1-y0,COLORS.pale);
   rect(ctx,631.5,y0,157,y2-y0,COLORS.pale);
-  centerText(ctx,'مستوى التحقق',50,y0,117,y1-y0,13,COLORS.red,700);
-  fitBoxText(ctx,'مؤشرات متابعة سلوك المتعلمين أثناء الدرس',167,y0,144,y1-y0,{size:12,min:9,color:COLORS.red,weight:700});
-  centerText(ctx,'مستوى التنفيذ',311,y0,84,y1-y0,12,COLORS.red,700);
-  centerText(ctx,'العنصر',395,y0,157.5,y2-y0,15,COLORS.red,700);
-  centerText(ctx,'مستوى التنفيذ',552.5,y0,79,y1-y0,12,COLORS.red,700);
-  centerText(ctx,'العنصر',631.5,y0,157,y2-y0,15,COLORS.red,700);
+
+  centerText(ctx,'مستوى التحقق',50,y0,117,y1-y0,12,COLORS.red,700);
+  fitBoxText(ctx,'مؤشرات متابعة سلوك المتعلمين أثناء الدرس',167,y0,144,y1-y0,{size:11,min:8,color:COLORS.red,weight:700});
+  centerText(ctx,'مستوى التنفيذ',311,y0,84,y1-y0,11.5,COLORS.red,700);
+  centerText(ctx,'العنصر',395,y0,157.5,y2-y0,14,COLORS.red,700);
+  centerText(ctx,'مستوى التنفيذ',552.5,y0,79,y1-y0,11.5,COLORS.red,700);
+  centerText(ctx,'العنصر',631.5,y0,157,y2-y0,14,COLORS.red,700);
+
   rect(ctx,50,y1,39,y2-y1,COLORS.pale);rect(ctx,89,y1,39,y2-y1,COLORS.pale);rect(ctx,128,y1,39,y2-y1,COLORS.pale);
   rect(ctx,167,y1,144,y2-y1,COLORS.pale);
   rect(ctx,311,y1,39,y2-y1,COLORS.pale);rect(ctx,350,y1,45,y2-y1,COLORS.pale);
   rect(ctx,552.5,y1,40,y2-y1,COLORS.pale);rect(ctx,592.5,y1,39,y2-y1,COLORS.pale);
-  fitBoxText(ctx,'غير متحقق',50,y1,39,y2-y1,{size:9,min:7,color:COLORS.red,weight:700});
-  fitBoxText(ctx,'متحقق جزئيًا',89,y1,39,y2-y1,{size:9,min:7,color:COLORS.red,weight:700});
-  fitBoxText(ctx,'متحقق',128,y1,39,y2-y1,{size:9,min:7,color:COLORS.red,weight:700});
-  centerText(ctx,'العنصر',167,y1,144,y2-y1,13,COLORS.red,700);
-  fitBoxText(ctx,'غير مناسب',311,y1,39,y2-y1,{size:9,min:7,color:COLORS.red,weight:700});
-  fitBoxText(ctx,'مناسب',350,y1,45,y2-y1,{size:9,min:7,color:COLORS.red,weight:700});
-  fitBoxText(ctx,'غير مناسب',552.5,y1,40,y2-y1,{size:9,min:7,color:COLORS.red,weight:700});
-  fitBoxText(ctx,'مناسب',592.5,y1,39,y2-y1,{size:9,min:7,color:COLORS.red,weight:700});
+
+  fitBoxText(ctx,'غير متحقق',50,y1,39,y2-y1,{size:8.5,min:6.5,color:COLORS.red,weight:700});
+  fitBoxText(ctx,'متحقق جزئيًا',89,y1,39,y2-y1,{size:8.3,min:6.3,color:COLORS.red,weight:700});
+  fitBoxText(ctx,'متحقق',128,y1,39,y2-y1,{size:8.5,min:6.5,color:COLORS.red,weight:700});
+  centerText(ctx,'العنصر',167,y1,144,y2-y1,11.5,COLORS.red,700);
+  fitBoxText(ctx,'غير مناسب',311,y1,39,y2-y1,{size:8.2,min:6.2,color:COLORS.red,weight:700});
+  fitBoxText(ctx,'مناسب',350,y1,45,y2-y1,{size:8.3,min:6.3,color:COLORS.red,weight:700});
+  fitBoxText(ctx,'غير مناسب',552.5,y1,40,y2-y1,{size:8.2,min:6.2,color:COLORS.red,weight:700});
+  fitBoxText(ctx,'مناسب',592.5,y1,39,y2-y1,{size:8.3,min:6.3,color:COLORS.red,weight:700});
 }
+
 function drawEvaluation(ctx,data){
   const xs=[50,89,128,167,311,350,395,552.5,592.5,631.5,788.5];
-  const ys=[448.5,506.5,583.5,680,757.5,835,912.5,990.5,1029.5];
+  const ys=[432,487,542,597,652,707,762,817,872];
   drawEvalHeaders(ctx);
-  // vertical and row cells
-  for(let r=0;r<7;r++){
+
+  for(let r=0;r<8;r++){
     const y=ys[r],h=ys[r+1]-ys[r];
     for(let c=0;c<10;c++)rect(ctx,xs[c],y,xs[c+1]-xs[c],h,'#fff');
-    if(r<6)fitBoxText(ctx,behaviorCriteria[r],167,y,144,h,{size:17,min:11,weight:700});
-    fitBoxText(ctx,middleCriteria[r],395,y,157.5,h,{size:17,min:10,weight:700});
-    fitBoxText(ctx,rightCriteria[r],631.5,y,157,h,{size:17,min:10,weight:700});
+
+    if(r<6)fitBoxText(ctx,behaviorCriteria[r],167,y,144,h,{size:14,min:9,weight:700});
+    fitBoxText(ctx,middleCriteria[r],395,y,157.5,h,{size:14,min:8.7,weight:700});
+    fitBoxText(ctx,rightCriteria[r],631.5,y,157,h,{size:14,min:8.7,weight:700});
+
     if(r<6){
       const sel=data.ratings['behavior'+r];
-      if(sel==='no')drawCheck(ctx,50,y,39,h); if(sel==='partial')drawCheck(ctx,89,y,39,h); if(sel==='yes')drawCheck(ctx,128,y,39,h);
+      if(sel==='no')drawCheck(ctx,50,y,39,h);
+      if(sel==='partial')drawCheck(ctx,89,y,39,h);
+      if(sel==='yes')drawCheck(ctx,128,y,39,h);
     }
-    const m=data.ratings['middle'+r]; if(m==='not')drawCheck(ctx,311,y,39,h);if(m==='ok')drawCheck(ctx,350,y,45,h);
-    const rr=data.ratings['right'+r]; if(rr==='not')drawCheck(ctx,552.5,y,40,h);if(rr==='ok')drawCheck(ctx,592.5,y,39,h);
+
+    const m=data.ratings['middle'+r];
+    if(m==='not')drawCheck(ctx,311,y,39,h);
+    if(m==='ok')drawCheck(ctx,350,y,45,h);
+
+    const rr=data.ratings['right'+r];
+    if(rr==='not')drawCheck(ctx,552.5,y,40,h);
+    if(rr==='ok')drawCheck(ctx,592.5,y,39,h);
   }
-  // final partial row lives at bottom and continues on page 2
-  const y=ys[7],h=ys[8]-ys[7];
-  for(let c=0;c<10;c++)rect(ctx,xs[c],y,xs[c+1]-xs[c],h,'#fff');
-  fitBoxText(ctx,'تنوع الأنشطة التعليمية بما',395,y,157.5,h,{size:15,min:10,weight:700});
-  fitBoxText(ctx,'الالتزام بزمن',631.5,y,157,h,{size:15,min:10,weight:700});
-  const m7=data.ratings.middle7;if(m7==='not')drawCheck(ctx,311,y,39,h);if(m7==='ok')drawCheck(ctx,350,y,45,h);
-  const r7=data.ratings.right7;if(r7==='not')drawCheck(ctx,552.5,y,40,h);if(r7==='ok')drawCheck(ctx,592.5,y,39,h);
 }
+
+function drawClosingSections(ctx,data){
+  ctx.textAlign='right';ctx.textBaseline='middle';
+
+  ctx.fillStyle=COLORS.red;font(ctx,15.5,500,'Tahoma');
+  ctx.fillText('استراتيجيات التدريس المنفذة',787,888);
+  line(ctx,70,899,787,899,'#333',1);
+  line(ctx,70,925,787,925,'#333',1);
+  fitBoxText(ctx,data.teachingStrategies,72,900,713,24,{size:11.5,min:7.5,weight:500,align:'right',pad:4});
+
+  ctx.fillStyle=COLORS.red;font(ctx,15.5,500,'Tahoma');
+  ctx.fillText('الممارسات التدريسية المكتسبة',787,942);
+  line(ctx,70,953,787,953,'#333',1);
+  line(ctx,70,979,787,979,'#333',1);
+  fitBoxText(ctx,data.learnedPractices,72,954,713,24,{size:11.5,min:7.5,weight:500,align:'right',pad:4});
+
+  const x=239,y=988,w=359;
+  rect(ctx,x,y,w,20,COLORS.pale);centerText(ctx,'الزائرة',x,y,w,20,13,COLORS.red,700);
+  rect(ctx,x,y+20,238,22,'#fff');rect(ctx,x+238,y+20,121,22,COLORS.pale);centerText(ctx,'الاسم',x+238,y+20,121,22,12,COLORS.red,700);
+  rect(ctx,x,y+42,238,22,'#fff');rect(ctx,x+238,y+42,121,22,COLORS.pale);centerText(ctx,'التوقيع',x+238,y+42,121,22,12,COLORS.red,700);
+  fitBoxText(ctx,data.visitorName,x,y+20,238,22,{size:11,min:8,weight:500});
+  if(data.signature&&$('signatureCanvas'))ctx.drawImage($('signatureCanvas'),x+5,y+45,228,16);
+}
+
 function drawPage1(ctx,data){
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctxBase(ctx);drawHeader(ctx);
-  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=COLORS.gold;font(ctx,30,700,'Tahoma');ctx.fillText('أداة ملاحظة',W/2,169);
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  ctxBase(ctx);drawHeader(ctx);
+
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle=COLORS.gold;font(ctx,30,700,'Tahoma');ctx.fillText('أداة ملاحظة',W/2,169);
   ctx.fillStyle=COLORS.red;font(ctx,25,400,'Tahoma');ctx.fillText('زيارة متبادلة',W/2-14,217);
   ctx.strokeStyle='#c70000';ctx.lineWidth=4;ctx.strokeRect(500,208,18,18);
-  drawInfoTable(ctx,data);ctx.fillStyle=COLORS.red;font(ctx,24,700,'Tahoma');ctx.fillText('عناصر تقويم الدرس',W/2,362);
-  drawEvaluation(ctx,data);drawFooter(ctx);
-}
-function drawPage2(ctx,data){
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctxBase(ctx);drawHeader(ctx);
-  // continuation row
-  const xs=[310,350,395,552.5,592.5,631.5,788.5],y=148,h=40;
-  for(let i=0;i<6;i++)rect(ctx,xs[i],y,xs[i+1]-xs[i],h,'#fff');
-  fitBoxText(ctx,'التعليمية بما يتناسب مع نواتج التعلم المستهدفة',395,y,157.5,h,{size:16,min:10,weight:700});
-  fitBoxText(ctx,'الحصة',631.5,y,157,h,{size:16,min:10,weight:700});
-  const m=data.ratings.middle7;if(m==='not')drawCheck(ctx,310,y,40,h);if(m==='ok')drawCheck(ctx,350,y,45,h);
-  const r=data.ratings.right7;if(r==='not')drawCheck(ctx,552.5,y,40,h);if(r==='ok')drawCheck(ctx,592.5,y,39,h);
-  // strategies
-  ctx.textAlign='right';ctx.fillStyle=COLORS.red;font(ctx,20,400,'Tahoma');ctx.fillText('استراتيجيات التدريس المنفذة',782,226);
-  line(ctx,70,232,762,232,'#111',1.3);line(ctx,70,257,762,257,'#111',1.3);
-  fitBoxText(ctx,data.teachingStrategies,72,231,690,28,{size:14,min:9,weight:500,align:'right'});
-  ctx.fillStyle=COLORS.red;font(ctx,20,400,'Tahoma');ctx.fillText('الممارسات التدريسية المكتسبة',782,276);
-  line(ctx,70,282,762,282,'#111',1.3);line(ctx,70,307,762,307,'#111',1.3);
-  fitBoxText(ctx,data.learnedPractices,72,281,690,28,{size:14,min:9,weight:500,align:'right'});
-  // visitor box
-  rect(ctx,239,337,359,25,COLORS.pale);centerText(ctx,'الزائرة',239,337,359,25,16,COLORS.red,700);
-  rect(ctx,239,362,238,27,'#fff');rect(ctx,477,362,121,27,COLORS.pale);centerText(ctx,'الاسم',477,362,121,27,14,COLORS.red,700);
-  rect(ctx,239,389,238,27,'#fff');rect(ctx,477,389,121,27,COLORS.pale);centerText(ctx,'التوقيع',477,389,121,27,14,COLORS.red,700);
-  fitBoxText(ctx,data.visitorName,239,362,238,27,{size:13,min:9,weight:500});
-  if(data.signature&&$('signatureCanvas'))ctx.drawImage($('signatureCanvas'),244,392,228,21)
+
+  drawInfoTable(ctx,data);
+  ctx.fillStyle=COLORS.red;font(ctx,23,700,'Tahoma');ctx.fillText('عناصر تقويم الدرس',W/2,361);
+
+  drawEvaluation(ctx,data);
+  drawClosingSections(ctx,data);
   drawFooter(ctx);
 }
+
 function renderPreview(){
   const data=currentData();
-  const c1=$('preview1'),c2=$('preview2');drawPage1(c1.getContext('2d'),data);drawPage2(c2.getContext('2d'),data);
+  const c1=$('preview1');
+  if(c1)drawPage1(c1.getContext('2d'),data);
 }
 function schedulePreview(){clearTimeout(previewTimer);previewTimer=setTimeout(renderPreview,80)}
-function makePageCanvas(page,data,scale=2){
-  const c=document.createElement('canvas');c.width=Math.round(W*scale);c.height=Math.round(H*scale);
-  const ctx=c.getContext('2d');ctx.scale(scale,scale); page===1?drawPage1(ctx,data):drawPage2(ctx,data); return c;
+
+function makePageCanvas(data,scale=2){
+  const c=document.createElement('canvas');
+  c.width=Math.round(W*scale);c.height=Math.round(H*scale);
+  const ctx=c.getContext('2d');ctx.scale(scale,scale);
+  drawPage1(ctx,data);
+  return c;
 }
+
 async function exportPdf(){
   if(!window.PDFLib)throw new Error('تعذر تحميل محرك PDF. تحققي من الاتصال بالإنترنت.');
   if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+
   const data=currentData(),doc=await PDFLib.PDFDocument.create();
-  for(const n of [1,2]){
-    const c=makePageCanvas(n,data,2);
-    const png=await doc.embedPng(c.toDataURL('image/png'));
-    const p=doc.addPage([595.28,841.89]);p.drawImage(png,{x:0,y:0,width:595.28,height:841.89});
-  }
-  doc.setTitle('زيارة متبادلة');doc.setCreator('متوسطة جميلة بنت عمر بن الخطاب');
-  const bytes=await doc.save(),blob=new Blob([bytes],{type:'application/pdf'}),url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='زيارة-متبادلة.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+  const c=makePageCanvas(data,2);
+  const png=await doc.embedPng(c.toDataURL('image/png'));
+  const p=doc.addPage([595.28,841.89]);
+  p.drawImage(png,{x:0,y:0,width:595.28,height:841.89});
+
+  doc.setTitle('زيارة متبادلة');
+  doc.setCreator('متوسطة جميلة بنت عمر بن الخطاب');
+
+  const bytes=await doc.save();
+  const blob=new Blob([bytes],{type:'application/pdf'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='زيارة-متبادلة.pdf';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
-function initPageSwitch(){
-  document.querySelectorAll('.page-switch button').forEach(b=>b.addEventListener('click',()=>{
-    document.querySelectorAll('.page-switch button').forEach(x=>x.classList.toggle('active',x===b));
-    $('preview1').hidden=b.dataset.page!=='1';$('preview2').hidden=b.dataset.page!=='2';
-  }));
-}
+
 async function init(){
-  initCriteria();setupSignature();initPageSwitch();
-  logoImg=new Image();logoImg.src='moe-logo.svg?v=20260920-1';try{await logoImg.decode()}catch(e){}
+  initCriteria();setupSignature();
+
+  logoImg=new Image();
+  logoImg.src='moe-logo.svg?v=20260920-1';
+  try{await logoImg.decode()}catch(e){}
+
   load();
+
   fieldIds.forEach(id=>$(id)&&$(id).addEventListener('input',schedulePreview));
   $('saveBtn').addEventListener('click',()=>save(true));
   $('clearBtn').addEventListener('click',()=>{if(confirm('هل تريدين مسح جميع بيانات الزيارة الحالية؟'))clearAll()});
   $('clearSignatureBtn').addEventListener('click',()=>{clearSignature();notice('تم مسح التوقيع.')});
   $('pdfBtn').addEventListener('click',async()=>{
-    const b=$('pdfBtn'),old=b.textContent;b.disabled=true;b.textContent='جارٍ إنشاء PDF...';notice('جارٍ إنشاء النموذج النهائي...');
-    try{save(false);await exportPdf();notice('تم إنشاء ملف PDF بنجاح.')}
+    const b=$('pdfBtn'),old=b.textContent;
+    b.disabled=true;b.textContent='جارٍ إنشاء PDF...';notice('جارٍ إنشاء النموذج النهائي...');
+    try{save(false);await exportPdf();notice('تم إنشاء ملف PDF بصفحة واحدة بنجاح.')}
     catch(e){console.error(e);notice(e.message||'تعذر إنشاء ملف PDF.',true)}
     finally{b.disabled=false;b.textContent=old}
   });
+
   if(document.fonts&&document.fonts.ready)await document.fonts.ready;
   renderPreview();
 }
+
 init();
 })();
