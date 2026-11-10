@@ -5,6 +5,7 @@
     student:{label:'وكيلة الشؤون الطلابية',name:'زكية الرفاعي'},
     activity:{label:'رائدة النشاط',name:'سميرة السناني'},
     school:{label:'وكيلة الشؤون المدرسية',name:'فاطمة مصطفى'},
+    counseling:{label:'الإرشاد الطلابي',name:'زينب الرفاعي - وضحى القحطاني'},
     none:{label:'مديرة المدرسة',name:'حنان الغامدي'}
   };
   const purple=[218,167,201]; // #DAA7C9
@@ -180,7 +181,7 @@
     cell(page,font,70,y,35,h,'عدد المستفيدات',tableFill,labelColor,labelSize,'center');
     cell(page,font,10,y,60,h,d.count,null,C.dark,12.5,'center');
     y+=h;
-    for(const [lab,txt,rh] of [[reportType?'الهدف من '+reportType:'الهدف',d.goal,30],['إجراءات التنفيذ',d.steps,34],['المخرجات وقياس الأثر',d.results,34]]){
+    for(const [lab,txt,rh] of [['الهدف',d.goal,30],['إجراءات التنفيذ',d.steps,34],['المخرجات وقياس الأثر',d.results,34]]){
       cell(page,font,165,y,35,rh,lab,tableFill,labelColor,labelSize,'center');
       cell(page,font,10,y,155,rh,txt,null,C.dark,12.5,'right',2,rh>=30);
       y+=rh;
@@ -322,7 +323,7 @@
     y+=row2H;
 
     const sections=[
-      {label:reportType?'الهدف من '+reportType:'الهدف',text:d.goal,minH:30},
+      {label:'الهدف',text:d.goal,minH:30},
       {label:'إجراءات التنفيذ',text:d.steps,minH:34},
       {label:'المخرجات وقياس الأثر',text:d.results,minH:34}
     ];
