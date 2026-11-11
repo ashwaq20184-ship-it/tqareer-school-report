@@ -18,6 +18,7 @@ header{margin-bottom:14px}h1{font-size:clamp(1.65rem,3.3vw,2.35rem)}
 .player{position:sticky;top:12px;z-index:1}
 iframe{height:auto}
 .sound-panel{min-width:0}
+.group-picker{display:none}
 .sound-panel h2{font-size:1rem;margin:0 0 6px}
 .sound-panel section{display:grid;grid-template-columns:77px minmax(0,1fr);align-items:center;gap:5px;padding:4px 6px;margin:0 0 4px;border-radius:9px}
 .sound-panel h3{font-size:.78rem;margin:0;padding-inline-start:4px;white-space:nowrap}
@@ -33,12 +34,15 @@ footer{margin-top:10px}
   .status{min-height:48px;font-size:.83rem;padding:5px 9px}
   .sound-panel section{grid-template-columns:66px minmax(0,1fr);padding-inline:4px}
   .sound-panel h3{font-size:.71rem}
+  .group-picker{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-bottom:7px}
+  .group-picker button{min-height:36px;padding:1px;font-size:.98rem;border-radius:6px}
+  .sound-panel section:not(.selected-group){display:none}
 }
 </style></head>
 <body><main>
 <header><div class="school">متوسطة جميلة بنت عمر بن الخطاب بينبع البحر</div><h1>الفونيكس | من الصوت إلى الكلمة</h1><p>اختاري صوتًا من مجموعات جولي فونكس، ثم استمعي وردّدي.</p><div class="byline">إعداد المعلمة أشواق محمد الحربي</div></header>
 <div class="practice"><div class="player" id="player"><iframe id="video" title="فيديو أصوات جولي فونكس بالنطق الأمريكي" src="https://www.youtube-nocookie.com/embed/3LD7m3luv0Y?playsinline=1&amp;rel=0&amp;enablejsapi=1" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><p class="status" role="status" id="status">اختاري صوتًا للانتقال إلى موضعه في الفيديو.</p></div>
-<div class="sound-panel"><h2>مجموعات الأصوات السبع</h2><div id="groups"></div></div></div>
+<div class="sound-panel"><h2>مجموعات الأصوات السبع</h2><div class="group-picker" role="group" aria-label="اختيار مجموعة الأصوات"></div><div id="groups"></div></div></div>
 <footer>الفيديو بالنطق الأمريكي من <a href="https://www.youtube.com/watch?v=3LD7m3luv0Y">Jolly Learning</a>.</footer>
 </main>
 <script>
@@ -56,6 +60,9 @@ const video = document.querySelector('#video');
 const status = document.querySelector('#status');
 const groupsElement = document.querySelector('#groups');
 const digits = '١٢٣٤٥٦٧';
+const picker = document.querySelector('.group-picker');
+let selectedGroup;
+let selectedGroupButton;
 let activeButton;
 let youtubePlayer;
 let playerReady = false;
@@ -80,6 +87,25 @@ groups.forEach((sounds,groupIndex) => {
   const section = document.createElement('section');
   const heading = document.createElement('h3');
   heading.textContent = 'المجموعة ' + digits[groupIndex];
+  const groupButton = document.createElement('button');
+  groupButton.type = 'button';
+  groupButton.textContent = digits[groupIndex];
+  groupButton.setAttribute('aria-label',heading.textContent);
+  groupButton.setAttribute('aria-pressed',String(groupIndex === 0));
+  picker.append(groupButton);
+  if (groupIndex === 0) {
+    selectedGroup = section;
+    selectedGroupButton = groupButton;
+    section.classList.add('selected-group');
+  }
+  groupButton.addEventListener('click', () => {
+    selectedGroup.classList.remove('selected-group');
+    selectedGroupButton.setAttribute('aria-pressed','false');
+    selectedGroup = section;
+    selectedGroupButton = groupButton;
+    section.classList.add('selected-group');
+    groupButton.setAttribute('aria-pressed','true');
+  });
   const row = document.createElement('div');
   row.className = 'sounds';
   row.dir = 'ltr';
