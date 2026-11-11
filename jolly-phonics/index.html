@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>������� | �� ���� ��� �����</title>
+<style>
+:root{color-scheme:light;--ink:#172e3a;--teal:#235d62;--line:#c5d8d3;--mint:#e8f3ef;--paper:#f7faf8}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Tahoma,Arial,sans-serif;line-height:1.65}main{width:min(880px,100% - 32px);margin:auto;padding:35px 0 26px}
+header{margin-bottom:18px}h1{margin:0;color:var(--teal);font-size:clamp(1.65rem,5vw,2.7rem);line-height:1.35}p{margin:6px 0 0}
+.player{border:1px solid var(--line);background:#fff;border-radius:18px;overflow:hidden;scroll-margin-top:12px}
+iframe{border:0;display:block;width:100%;aspect-ratio:16/9;max-height:420px;background:#101b1c}.status{min-height:44px;padding:8px 15px;margin:0;color:var(--teal);font-weight:bold}
+h2{font-size:1.24rem;margin:20px 0 8px}section{border:1px solid var(--line);padding:10px 13px 13px;border-radius:13px;background:#fff;margin-bottom:8px}h3{font-size:.94rem;margin:0 0 6px;color:var(--teal)}
+.sounds{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}button{font:700 1.25rem Arial,sans-serif;color:var(--teal);background:var(--mint);min-height:47px;border:1px solid var(--line);border-radius:8px;cursor:pointer;display:grid;place-content:center}button small{font-size:.69rem;font-weight:500}button:hover{border-color:var(--teal)}button[aria-pressed=true]{color:#fff;background:var(--teal)}button:focus-visible,a:focus-visible{outline:3px solid #a45c19;outline-offset:2px}footer{margin-top:17px;font-size:.85rem}a{color:var(--teal)}@media(max-width:460px){main{padding-top:20px}.sounds{gap:4px}section{padding-inline:7px}button{font-size:1.09rem}}
+.school{color:var(--teal);font-weight:700;font-size:.95rem;margin-bottom:5px}.byline{font-size:.88rem;margin-top:5px;color:#405765}</style></head>
+<body><main>
+<header><div class="school">���� ���� �� �� �� ��០ ���� �頥�</div><h1>������� | �� ���� ��� �����</h1><p>������ ���� �� ���㟢 ���� ����? �� ������ ������.</p><div class="byline">�㧟� ������ ���� �� �饩��</div></header>
+<div class="player" id="player"><iframe id="video" title="فيديو أصوات جولي فونكس بالنطق الأمريكي" src="https://www.youtube-nocookie.com/embed/3LD7m3luv0Y?playsinline=1&amp;rel=0&amp;enablejsapi=1" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><p class="status" role="status" id="status">������ ���� ����� ��� ����� �� ������.</p></div>
+<h2>���㟢 �隭ퟢ �髠�</h2><div id="groups"></div>
+<footer>������ ������ ������ �� <a href="https://www.youtube.com/watch?v=3LD7m3luv0Y">Jolly Learning</a>.</footer>
+</main>
+<script>
+const groups = [
+['s','a','t','i','p','n'],
+['c/k','e','h','r','m','d'],
+['g','o','u','l','f','b'],
+['ai','j','oa','ie','ee','or'],
+['z','w','ng','v','oo /?/','oo /u?/'],
+['y','x','ch','sh','th /?/','th /?/'],
+['qu','ou','oi','ue','er','ar']
+];
+const times = [4,10,16.75,23.5,29.75,36,42,47,53.25,58.5,64,69,74,78.75,84.5,89.75,95.25,100.75,105.75,111,116.75,122.75,129,136,142.25,148.25,155.25,162,167.75,173.5,179.5,185.25,192.25,198.5,204.5,210.75,216.75,222.5,229.25,235.75,242.75,249.25];
+const video = document.querySelector('#video');
+const status = document.querySelector('#status');
+const groupsElement = document.querySelector('#groups');
+const digits = '???????';
+let activeButton;
+let youtubePlayer;
+let playerReady = false;
+window.onYouTubeIframeAPIReady = () => {
+  youtubePlayer = new YT.Player('video', {events:{onReady:() => { playerReady = true; }}});
+};
+function playSound(button, sound, start) {
+  if (activeButton) activeButton.setAttribute('aria-pressed','false');
+  activeButton = button;
+  button.setAttribute('aria-pressed','true');
+  if (playerReady) {
+    youtubePlayer.seekTo(start, true);
+    youtubePlayer.playVideo();
+  } else {
+    video.src = "https://www.youtube-nocookie.com/embed/3LD7m3luv0Y?playsinline=1&rel=0&enablejsapi=1&autoplay=1&start=" + Math.floor(start);
+  }
+  status.replaceChildren('���� ��ꦢ�� ', Object.assign(document.createElement('bdi'), {textContent:sound,dir:'ltr'}));
+  if (document.querySelector('#player').getBoundingClientRect().top < 0) {
+    document.querySelector('#player').scrollIntoView({block:'start'});
+  }
+
+}
+groups.forEach((sounds,groupIndex) => {
+  const section = document.createElement('section');
+  const heading = document.createElement('h3');
+  heading.textContent = '������ ' + digits[groupIndex];
+  const row = document.createElement('div');
+  row.className = 'sounds';
+  row.dir = 'ltr';
+  sounds.forEach((sound,index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    const [letters, ipa] = sound.split(' ');
+    button.textContent = letters;
+    if (ipa) button.append(Object.assign(document.createElement('small'),{textContent:ipa}));
+    button.setAttribute('aria-pressed','false');
+    button.addEventListener('click', () => playSound(button,sound,times[groupIndex * 6 + index]));
+    row.append(button);
+  });
+  section.append(heading,row);
+  groupsElement.append(section);
+});
+</script><script async src="https://www.youtube.com/iframe_api"></script></body></html>
