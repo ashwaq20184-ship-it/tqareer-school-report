@@ -40,7 +40,7 @@ footer{margin-top:10px}
 }
 </style></head>
 <body><main>
-<header><div class="school">متوسطة جميلة بنت عمر بن الخطاب بينبع البحر</div><h1>الفونيكس | من الصوت إلى الكلمة</h1><p>اختاري صوتًا من مجموعات جولي فونكس، ثم استمعي وردّدي.</p><div class="byline">إعداد المعلمة أشواق محمد الحربي</div></header>
+<header><div class="school">متوسطة جميلة بنت عمر بن الخطاب بينبع البحر</div><h1>الفونيكس | من الصوت إلى الكلمة</h1><p>اختاري صوتًا، ثم استمعي إلى نطقه وكلمة المثال. يتوقف المقطع تلقائيًا.</p><div class="byline">إعداد المعلمة أشواق محمد الحربي</div></header>
 <div class="practice"><div class="player" id="player"><iframe id="video" title="فيديو أصوات جولي فونكس بالنطق الأمريكي" src="https://www.youtube-nocookie.com/embed/3LD7m3luv0Y?playsinline=1&amp;rel=0&amp;enablejsapi=1" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><p class="status" role="status" id="status">اختاري صوتًا للانتقال إلى موضعه في الفيديو.</p></div>
 <div class="sound-panel"><h2>مجموعات الأصوات السبع</h2><div class="group-picker" role="group" aria-label="اختيار مجموعة الأصوات"></div><div id="groups"></div></div></div>
 <footer>الفيديو بالنطق الأمريكي من <a href="https://www.youtube.com/watch?v=3LD7m3luv0Y">Jolly Learning</a>.</footer>
@@ -56,6 +56,8 @@ const groups = [
 ['qu','ou','oi','ue','er','ar']
 ];
 const times = [4,10,16.75,23.5,29.75,36,42,47,53.25,58.5,64,69,74,78.75,84.5,89.75,95.25,100.75,105.75,111,116.75,122.75,129,136,142.25,148.25,155.25,162,167.75,173.5,179.5,185.25,192.25,198.5,204.5,210.75,216.75,222.5,229.25,235.75,242.75,249.25];
+const videoId = '3LD7m3luv0Y';
+const clipEnds = [...times.slice(1).map(start => start - 0.25), 255.2];
 const video = document.querySelector('#video');
 const status = document.querySelector('#status');
 const groupsElement = document.querySelector('#groups');
@@ -69,15 +71,20 @@ let playerReady = false;
 window.onYouTubeIframeAPIReady = () => {
   youtubePlayer = new YT.Player('video', {events:{onReady:() => { playerReady = true; }}});
 };
-function playSound(button, sound, start) {
+function playSound(button, sound, index) {
+  const start = times[index];
+  const end = clipEnds[index];
   if (activeButton) activeButton.setAttribute('aria-pressed','false');
   activeButton = button;
   button.setAttribute('aria-pressed','true');
   if (playerReady) {
-    youtubePlayer.seekTo(start, true);
-    youtubePlayer.playVideo();
+    youtubePlayer.loadVideoById({videoId, startSeconds:start, endSeconds:end});
   } else {
-    video.src = "https://www.youtube-nocookie.com/embed/3LD7m3luv0Y?playsinline=1&rel=0&enablejsapi=1&autoplay=1&start=" + Math.floor(start);
+    const params = new URLSearchParams({
+      playsinline:'1', rel:'0', enablejsapi:'1', autoplay:'1',
+      start:String(Math.floor(start)), end:String(Math.ceil(end))
+    });
+    video.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?' + params;
   }
   const link = Object.assign(document.createElement('a'), {textContent:'فتح المقطع في يوتيوب',href:'https://youtu.be/3LD7m3luv0Y?t='+Math.floor(start),target:'_blank',rel:'noopener'});
   status.replaceChildren('الصوت المختار ', Object.assign(document.createElement('bdi'), {textContent:sound,dir:'ltr'}), ' · ', link);
@@ -116,7 +123,7 @@ groups.forEach((sounds,groupIndex) => {
     button.textContent = letters;
     if (ipa) button.append(Object.assign(document.createElement('small'),{textContent:ipa}));
     button.setAttribute('aria-pressed','false');
-    button.addEventListener('click', () => playSound(button,sound,times[groupIndex * 6 + index]));
+    button.addEventListener('click', () => playSound(button,sound,groupIndex * 6 + index));
     row.append(button);
   });
   section.append(heading,row);
