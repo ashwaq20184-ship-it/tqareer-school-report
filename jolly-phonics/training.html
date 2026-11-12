@@ -14,7 +14,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Tahoma,Aria
 [data-group="7"]{--group-ink:#3f4c89;--group-tint:#eceffc;--group-border:#ccd3ef}
 body[data-group]{--teal:var(--group-ink);--mint:var(--group-tint);--line:var(--group-border)}
 #group-name{color:var(--teal);background:var(--mint);border:1px solid var(--line);padding:2px 8px;border-radius:6px}
-.actions a.btn{display:inline-flex;align-items:center;text-decoration:none}
 </style>
 <body><main>
 <header><div class="top"><a id="back" href="./">العودة إلى الأصوات</a><span id="group-name"></span></div><h1>تدريب الفونيكس</h1></header>
@@ -135,11 +134,6 @@ function render(focus=false){
       actions.append(button('أعيدي ما أخطأتِ فيه',()=>begin(redo),'btn primary'));
     }
     actions.append(button('أعيدي تدريب المجموعة',()=>begin(full)));
-    const survey = make('a','قيّمي التدريب','btn');
-    survey.href = 'https://form.jotform.com/263147214819055';
-    survey.target = '_blank';
-    survey.rel = 'noopener';
-    actions.append(survey);
     card.append(actions);
     if(focus)title.focus();
     return;
