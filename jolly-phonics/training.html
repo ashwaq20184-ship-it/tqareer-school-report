@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تدريب الفونيكس | من الصوت إلى الكلمة</title>
+<style>
+:root{--ink:#172e3a;--teal:#235d62;--line:#bdd1cb;--mint:#e8f3ef;--paper:#f7faf8}*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Tahoma,Arial,sans-serif}main{width:min(650px,100% - 28px);margin:24px auto}a{color:var(--teal)}header{margin:0 0 14px}h1{font-size:clamp(1.55rem,5vw,2.1rem);margin:4px 0;color:var(--teal)}h2{margin:0;font-size:1.36rem}.top{display:flex;justify-content:space-between;gap:6px;align-items:baseline;font-size:.85rem}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:clamp(14px,4vw,25px)}.meta{display:flex;justify-content:space-between;color:var(--teal);font-size:.88rem;font-weight:bold;align-items:center;gap:10px;margin-bottom:10px}.track{height:6px;background:var(--mint);border-radius:5px;overflow:hidden;margin-bottom:17px}.track div{height:100%;background:var(--teal)}p{margin:8px 0 13px}.choices,.slots,.phonemes{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:12px 0}.letter,.slot,.phonemes span{min-width:47px;min-height:45px;display:grid;place-content:center;font:700 1.42rem Arial,sans-serif;border-radius:8px;border:1px solid var(--line);background:var(--mint);color:var(--teal);padding:4px 9px}.slot{background:white;border-style:dashed}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.btn{font:inherit;font-size:.94rem;font-weight:bold;border:1px solid var(--teal);border-radius:8px;padding:8px 13px;min-height:44px;cursor:pointer;color:var(--teal);background:#fff}.primary{background:var(--teal);color:#fff}.letter{cursor:pointer}button:disabled{opacity:.55;cursor:default}button:focus-visible,a:focus-visible{outline:3px solid #a45c19;outline-offset:2px}.feedback{min-height:28px;color:var(--teal);font-weight:bold;margin:8px 0}.feedback.error{color:#94421f}.word{display:block;text-align:center;font:700 2rem Arial,sans-serif;margin:14px 0;color:var(--teal)}.review{display:flex;gap:7px;flex-wrap:wrap}.review bdi{padding:2px 8px;background:var(--mint);border-radius:6px}footer{color:#405765;font-size:.8rem;margin-top:13px}
+</style>
+<body><main>
+<header><div class="top"><a id="back" href="./">العودة إلى الأصوات</a><span id="group-name"></span></div><h1>تدريب الفونيكس</h1></header>
+<div class="card" id="card"></div>
+<footer>متوسطة جميلة بنت عمر بن الخطاب بينبع البحر · إعداد المعلمة أشواق محمد الحربي</footer>
+</main>
+<script>
+const groups = [{"hear":[{"answer":"s","choices":["s","t","p"]},{"answer":"t","choices":["s","t","p"]}],"read":[["s","a","t"],["t","a","p"]],"build":[["p","i","n"],["n","a","p"]]},{"hear":[{"answer":"e","choices":["e","h","m"]},{"answer":"m","choices":["e","h","m"]}],"read":[["m","a","t"],["h","e","n"]],"build":[["r","e","d"],["c","a","t"]]},{"hear":[{"answer":"g","choices":["g","l","f"]},{"answer":"f","choices":["g","l","f"]}],"read":[["b","u","g"],["l","o","g"]],"build":[["f","u","n"],["d","o","g"]]},{"hear":[{"answer":"ai","choices":["ai","oa","ee"]},{"answer":"ee","choices":["ai","oa","ee"]}],"read":[["r","ai","n"],["b","oa","t"]],"build":[["b","ee"],["j","a","m"]]},{"hear":[{"answer":"w","choices":["z","w","ng"]},{"answer":"ng","choices":["z","w","ng"]}],"read":[["b","oo","k"],["m","oo","n"]],"build":[["r","i","ng"],["v","a","n"]]},{"hear":[{"answer":"ch","choices":["ch","sh","th"]},{"answer":"sh","choices":["ch","sh","th"]}],"read":[["sh","i","p"],["ch","i","n"]],"build":[["th","i","n"],["f","o","x"]]},{"hear":[{"answer":"ou","choices":["ou","oi","ar"]},{"answer":"oi","choices":["ou","oi","ar"]}],"read":[["c","oi","n"],["c","ar"]],"build":[["qu","a","ck"],["b","oi","l"]]}];
+const requested = Number(new URLSearchParams(location.search).get('group'));
+const group = Number.isInteger(requested) && requested >= 1 && requested <= 7 ? requested : 1;
+const digits = '١٢٣٤٥٦٧';
+const data = groups[group-1];
+const full = [
+  ...data.hear.map((q,clip)=>({...q,clip,type:'hear'})),
+  ...data.read.map((letters,i)=>({letters,answer:letters.join(''),clip:i+2,type:'read'})),
+  ...data.build.map((letters,i)=>({letters,answer:letters.join(''),clip:i+4,type:'build'}))
+];
+const back = document.querySelector('#back');
+back.href = './?group='+group;
+back.textContent = 'العودة إلى أصوات المجموعة';
+document.querySelector('#group-name').textContent = 'المجموعة '+digits[group-1];
+const card = document.querySelector('#card');
+let queue=full, position=0, mistakes=new Set(), firstCorrect=0, attempted=false, entered=[], used=[], audioContext, audioBuffer, playing, playRequest=0;
+const slotSeconds=1.35;
+
+function make(tag,text,className){
+  const e=document.createElement(tag);
+  if(text)e.textContent=text;
+  if(className)e.className=className;
+  return e;
+}
+function button(label,action,style='btn'){
+  const b=make('button',label,style);
+  b.type='button';
+  b.addEventListener('click',action);
+  return b;
+}
+function feedback(text,error=false){
+  const f=document.querySelector('#feedback');
+  f.textContent=text;
+  f.classList.toggle('error',error);
+}
+function stopAudio(){
+  playRequest++;
+  if(playing){playing.stop();playing=null;}
+}
+async function play(clip,onStart){
+  stopAudio();
+  const request=playRequest;
+  try {
+    audioContext ??= new (window.AudioContext||window.webkitAudioContext)();
+    await audioContext.resume();
+    if(!audioBuffer){
+      audioBuffer=fetch('audio-'+group+'.flac').then(r=>{
+        if(!r.ok)throw Error('audio unavailable');
+        return r.arrayBuffer();
+      }).then(bytes=>audioContext.decodeAudioData(bytes)).catch(error=>{audioBuffer=null;throw error;});
+    }
+    const buffer=await audioBuffer;
+    if(request!==playRequest)return;
+    playing=audioContext.createBufferSource();
+    playing.buffer=buffer;
+    playing.connect(audioContext.destination);
+    playing.start(0,clip*slotSeconds,slotSeconds);
+    if(onStart)onStart();
+  } catch {
+    if(request===playRequest)feedback('تعذّر تشغيل الصوت. أعيدي الضغط على زر الاستماع.',true);
+  }
+}
+function shuffled(list){
+  const copy=list.slice();
+  for(let i=copy.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [copy[i],copy[j]]=[copy[j],copy[i]];
+  }
+  return copy;
+}
+function next(){
+  stopAudio();
+  position++;
+  render(true);
+}
+function begin(items){
+  queue=items;
+  position=0;
+  firstCorrect=0;
+  mistakes=new Set();
+  render(true);
+}
+function check(ok,hint){
+  const q=queue[position];
+  if(!attempted){
+    attempted=true;
+    if(ok)firstCorrect++;
+    else mistakes.add(q);
+  }
+  if(!ok){feedback(hint,true);return;}
+  feedback('أحسنتِ، إجابة صحيحة.');
+  card.querySelectorAll('button').forEach(b=>b.disabled=true);
+  const go=button('التالي',next,'btn primary');
+  card.querySelector('.actions').append(go);
+  go.focus();
+}
+function render(focus=false){
+  attempted=false;
+  entered=[];
+  used=[];
+  card.replaceChildren();
+  if(position===queue.length){
+    const scored=queue.filter(q=>q.type!=='read').length;
+    const title=make('h2','أكملتِ التدريب');
+    title.tabIndex=-1;
+    card.append(title,make('p',scored?'الإجابات الصحيحة من أول محاولة '+firstCorrect+' من '+scored+'.':'أكملتِ أنشطة القراءة.'));
+    const actions=make('div','','actions');
+    if(mistakes.size){
+      const redo=[...mistakes];
+      actions.append(button('أعيدي ما أخطأتِ فيه',()=>begin(redo),'btn primary'));
+    }
+    actions.append(button('أعيدي تدريب المجموعة',()=>begin(full)));
+    card.append(actions);
+    if(focus)title.focus();
+    return;
+  }
+  const q=queue[position];
+  const titles={hear:'اسمعي واختاري',read:'ادمجي واقرئي',build:'اسمعي وركّبي'};
+  const meta=make('div','نشاط '+(position+1)+' من '+queue.length,'meta');
+  const track=make('div','','track');
+  track.setAttribute('aria-hidden','true');
+  const fill=make('div');fill.style.width=(position+1)/queue.length*100+'%';track.append(fill);
+  const title=make('h2',titles[q.type]);title.tabIndex=-1;
+  const f=make('p','','feedback');f.id='feedback';f.setAttribute('role','status');
+  const actions=make('div','','actions');
+  card.append(meta,track,title);
+  if(q.type==='hear'){
+    card.append(make('p','اسمعي الصوت، ثم اختاري الحرف أو الحروف التي تمثّله.'));
+    actions.append(button('اسمعي الصوت',()=>play(q.clip),'btn primary'));
+    const row=make('div','','choices');row.dir='ltr';
+    shuffled(q.choices).forEach(x=>row.append(button(x,()=>check(x===q.answer,'اسمعي الصوت مرة أخرى، ثم حاولي.'),'letter')));
+    card.append(actions,row,f);
+  }else if(q.type==='read'){
+    card.append(make('p','انطقي الأصوات بالترتيب، ثم ادمجيها واقرئي الكلمة بصوتك.'));
+    const row=make('div','','phonemes');row.dir='ltr';
+    q.letters.forEach(x=>row.append(make('span',x)));
+    const answer=make('bdi',q.answer,'word');answer.dir='ltr';answer.hidden=true;answer.style.display='none';
+    const go=button('التالي',next,'btn primary');go.disabled=true;
+    actions.append(button('اسمعي الكلمة بعد المحاولة',()=>play(q.clip,()=>{answer.hidden=false;answer.style.display='block';go.disabled=false;feedback('قارني قراءتكِ بالنموذج.');})),go);
+    card.append(row,answer,actions,f);
+  }else{
+    card.append(make('p','اسمعي الكلمة ثم رتّبي الحروف لتكوينها.'));
+    actions.append(button('اسمعي الكلمة',()=>play(q.clip),'btn primary'));
+    const slots=make('div','','slots');slots.dir='ltr';
+    const tiles=make('div','','choices');tiles.dir='ltr';
+    q.letters.forEach(()=>slots.append(make('span','ـ','slot')));
+    const distractors=data.hear.flatMap(x=>x.choices).filter(x=>!q.letters.includes(x));
+    const extra=[...new Set(distractors)].slice(0,1);
+    const tilesList=shuffled([...q.letters,...extra]).map(letter=>button(letter,()=>{},'letter'));
+    function refresh(){
+      [...slots.children].forEach((s,i)=>s.textContent=entered[i]??'ـ');
+      tilesList.forEach((b,i)=>b.disabled=used.includes(i)||entered.length===q.letters.length);
+      undo.disabled=!entered.length;
+      verify.disabled=entered.length!==q.letters.length;
+    }
+    tilesList.forEach((b,i)=>{
+      b.addEventListener('click',()=>{entered.push(b.textContent);used.push(i);refresh();});
+      tiles.append(b);
+    });
+    const undo=button('احذفي آخر حرف',()=>{entered.pop();used.pop();refresh();});
+    const verify=button('تحققي',()=>check(entered.join('')===q.answer,'اسمعي بداية الكلمة مرة أخرى، ثم راجعي ترتيب الحروف.'),'btn primary');
+    const controls=make('div','','actions');controls.append(undo,verify);
+    card.append(actions,slots,tiles,controls,f);
+    refresh();
+  }
+  if(focus)title.focus();
+}
+render();
+</script>
+</body></html>
