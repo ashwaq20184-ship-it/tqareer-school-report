@@ -96,6 +96,9 @@ function playSound(button, sound, index) {
   if (activeButton) activeButton.setAttribute('aria-pressed','false');
   activeButton = button;
   button.setAttribute('aria-pressed','true');
+  const practiceLink = button.closest('section').querySelector('.train-link');
+  const groupNumber = Math.floor(index / 6) + 1;
+  practiceLink.href = './training.html?group=' + groupNumber + '&sound=' + (index % 6 + 1);
   if (playerReady) {
     youtubePlayer.loadVideoById({videoId, startSeconds:start, endSeconds:end});
   } else {
