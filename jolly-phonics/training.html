@@ -5,6 +5,16 @@
 <style>
 :root{--ink:#172e3a;--teal:#235d62;--line:#bdd1cb;--mint:#e8f3ef;--paper:#f7faf8}*{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Tahoma,Arial,sans-serif}main{width:min(650px,100% - 28px);margin:24px auto}a{color:var(--teal)}header{margin:0 0 14px}h1{font-size:clamp(1.55rem,5vw,2.1rem);margin:4px 0;color:var(--teal)}h2{margin:0;font-size:1.36rem}.top{display:flex;justify-content:space-between;gap:6px;align-items:baseline;font-size:.85rem}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:clamp(14px,4vw,25px)}.meta{display:flex;justify-content:space-between;color:var(--teal);font-size:.88rem;font-weight:bold;align-items:center;gap:10px;margin-bottom:10px}.track{height:6px;background:var(--mint);border-radius:5px;overflow:hidden;margin-bottom:17px}.track div{height:100%;background:var(--teal)}p{margin:8px 0 13px}.choices,.slots,.phonemes{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:12px 0}.letter,.slot,.phonemes span{min-width:47px;min-height:45px;display:grid;place-content:center;font:700 1.42rem Arial,sans-serif;border-radius:8px;border:1px solid var(--line);background:var(--mint);color:var(--teal);padding:4px 9px}.slot{background:white;border-style:dashed}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.btn{font:inherit;font-size:.94rem;font-weight:bold;border:1px solid var(--teal);border-radius:8px;padding:8px 13px;min-height:44px;cursor:pointer;color:var(--teal);background:#fff}.primary{background:var(--teal);color:#fff}.letter{cursor:pointer}button:disabled{opacity:.55;cursor:default}button:focus-visible,a:focus-visible{outline:3px solid #a45c19;outline-offset:2px}.feedback{min-height:28px;color:var(--teal);font-weight:bold;margin:8px 0}.feedback.error{color:#94421f}.word{display:block;text-align:center;font:700 2rem Arial,sans-serif;margin:14px 0;color:var(--teal)}.review{display:flex;gap:7px;flex-wrap:wrap}.review bdi{padding:2px 8px;background:var(--mint);border-radius:6px}footer{color:#405765;font-size:.8rem;margin-top:13px}
+[data-group="1"]{--group-ink:#235d62;--group-tint:#e8f3ef;--group-border:#b9d8d1}
+[data-group="2"]{--group-ink:#205784;--group-tint:#e8f3fb;--group-border:#bfd8eb}
+[data-group="3"]{--group-ink:#654482;--group-tint:#f3ecf8;--group-border:#dac9e8}
+[data-group="4"]{--group-ink:#8d461b;--group-tint:#fff0e1;--group-border:#edd0b2}
+[data-group="5"]{--group-ink:#376331;--group-tint:#edf5e7;--group-border:#c9dfbf}
+[data-group="6"]{--group-ink:#8a3e61;--group-tint:#f9eaf0;--group-border:#ecc9d9}
+[data-group="7"]{--group-ink:#3f4c89;--group-tint:#eceffc;--group-border:#ccd3ef}
+body[data-group]{--teal:var(--group-ink);--mint:var(--group-tint);--line:var(--group-border)}
+#group-name{color:var(--teal);background:var(--mint);border:1px solid var(--line);padding:2px 8px;border-radius:6px}
+.actions a.btn{display:inline-flex;align-items:center;text-decoration:none}
 </style>
 <body><main>
 <header><div class="top"><a id="back" href="./">العودة إلى الأصوات</a><span id="group-name"></span></div><h1>تدريب الفونيكس</h1></header>
@@ -15,6 +25,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Tahoma,Aria
 const groups = [{"hear":[{"answer":"s","choices":["s","t","p"]},{"answer":"t","choices":["s","t","p"]}],"read":[["s","a","t"],["t","a","p"]],"build":[["p","i","n"],["n","a","p"]]},{"hear":[{"answer":"e","choices":["e","h","m"]},{"answer":"m","choices":["e","h","m"]}],"read":[["m","a","t"],["h","e","n"]],"build":[["r","e","d"],["c","a","t"]]},{"hear":[{"answer":"g","choices":["g","l","f"]},{"answer":"f","choices":["g","l","f"]}],"read":[["b","u","g"],["l","o","g"]],"build":[["f","u","n"],["d","o","g"]]},{"hear":[{"answer":"ai","choices":["ai","oa","ee"]},{"answer":"ee","choices":["ai","oa","ee"]}],"read":[["r","ai","n"],["b","oa","t"]],"build":[["b","ee"],["j","a","m"]]},{"hear":[{"answer":"w","choices":["z","w","ng"]},{"answer":"ng","choices":["z","w","ng"]}],"read":[["b","oo","k"],["m","oo","n"]],"build":[["r","i","ng"],["v","a","n"]]},{"hear":[{"answer":"ch","choices":["ch","sh","th"]},{"answer":"sh","choices":["ch","sh","th"]}],"read":[["sh","i","p"],["ch","i","n"]],"build":[["th","i","n"],["f","o","x"]]},{"hear":[{"answer":"ou","choices":["ou","oi","ar"]},{"answer":"oi","choices":["ou","oi","ar"]}],"read":[["c","oi","n"],["c","ar"]],"build":[["qu","a","ck"],["b","oi","l"]]}];
 const requested = Number(new URLSearchParams(location.search).get('group'));
 const group = Number.isInteger(requested) && requested >= 1 && requested <= 7 ? requested : 1;
+document.body.dataset.group = group;
 const digits = '١٢٣٤٥٦٧';
 const data = groups[group-1];
 const full = [
@@ -124,6 +135,11 @@ function render(focus=false){
       actions.append(button('أعيدي ما أخطأتِ فيه',()=>begin(redo),'btn primary'));
     }
     actions.append(button('أعيدي تدريب المجموعة',()=>begin(full)));
+    const survey = make('a','قيّمي التدريب','btn');
+    survey.href = 'https://form.jotform.com/263147214819055';
+    survey.target = '_blank';
+    survey.rel = 'noopener';
+    actions.append(survey);
     card.append(actions);
     if(focus)title.focus();
     return;
