@@ -229,9 +229,18 @@
       .ipr-e-sub{position:absolute;left:60px;right:60px;top:224px;text-align:center;font-size:14px;line-height:1.5;color:#555;font-weight:500}
       .ipr-grid{position:absolute;top:268px;left:45px;right:45px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
       .ipr-card{height:300px;border:2px solid #bbb;padding:9px;background:#fff;display:flex;flex-direction:column;overflow:hidden}
-      .ipr-card img{display:block;width:100%;height:250px;object-fit:contain;background:#fff}
-      .ipr-card.ipr-cap img{height:220px}
-      .ipr-caption{border-top:1px solid #ddd;margin-top:7px;padding-top:6px;text-align:center;font-size:13px;line-height:1.4;font-weight:500;color:#222}
+      .ipr-media{height:250px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff;margin:0 auto}
+      .ipr-card.ipr-cap .ipr-media{height:220px}
+      .ipr-media img{display:block;width:100%;height:100%;object-fit:contain;background:#fff}
+      .ipr-card.ipr-landscape .ipr-media{width:100%;height:250px}
+      .ipr-card.ipr-landscape.ipr-cap .ipr-media{width:100%;height:220px}
+      .ipr-card.ipr-square .ipr-media{width:230px;height:230px;margin:10px auto}
+      .ipr-card.ipr-square.ipr-cap .ipr-media{width:205px;height:205px;margin:7px auto}
+      .ipr-card.ipr-portrait .ipr-media{width:168px;height:250px;margin:0 auto}
+      .ipr-card.ipr-portrait.ipr-cap .ipr-media{width:148px;height:220px;margin:0 auto}
+      .ipr-media.ipr-media-empty{width:100%;height:250px}
+      .ipr-card.ipr-cap .ipr-media.ipr-media-empty{height:220px}
+      .ipr-caption{width:100%;border-top:1px solid #ddd;margin-top:7px;padding-top:6px;text-align:center;font-size:13px;line-height:1.4;font-weight:500;color:#222}
       .ipr-e-signline{position:absolute;left:45px;right:45px;bottom:69px;border-top:1px solid #d0d0d0;padding-top:13px}
     `;
   }
@@ -471,7 +480,7 @@
         const src=imgs[idx]||'';
         const cap=String(titles[idx]||'').trim();
         cards+=`<div class="ipr-card ${cap?'ipr-cap':''}">
-          ${src?`<img alt="" src="${src}">`:'<div style="height:250px"></div>'}
+          ${src?`<div class="ipr-media"><img alt="" src="${src}"></div>`:'<div class="ipr-media ipr-media-empty"></div>'}
           ${cap?`<div class="ipr-caption">${esc(cap)}</div>`:''}
         </div>`;
       }
@@ -502,6 +511,26 @@
       pages.push(page);
     }
     return pages;
+  }
+
+  function classifyEvidenceCards(root){
+    root.querySelectorAll('.ipr-card img').forEach(img=>{
+      const card=img.closest('.ipr-card');
+      if(!card)return;
+      card.classList.remove('ipr-landscape','ipr-square','ipr-portrait');
+
+      const w=Number(img.naturalWidth)||0;
+      const h=Number(img.naturalHeight)||0;
+      if(!w||!h){
+        card.classList.add('ipr-landscape');
+        return;
+      }
+
+      const ratio=w/h;
+      if(ratio>=1.18) card.classList.add('ipr-landscape');
+      else if(ratio<=0.85) card.classList.add('ipr-portrait');
+      else card.classList.add('ipr-square');
+    });
   }
 
   async function ensureReportFontsReady(){
@@ -619,6 +648,9 @@
       const pages=[...reportPages,...evidencePages];
 
       await waitForImages(root);
+      classifyEvidenceCards(root);
+      void root.offsetHeight;
+      await nextAnimationFrame();
       await ensureReportFontsReady();
       await settleVirtualLayout(root,reportPages);
 
