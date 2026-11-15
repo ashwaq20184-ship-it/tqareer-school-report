@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="visits.css?v=20261110-6">
+  <link rel="stylesheet" href="visits.css?v=20261115-1">
 </head>
 <body>
 <header class="top-nav">
@@ -32,7 +32,13 @@
         <label><span>المادة</span><input id="subjectName" autocomplete="off"></label>
         <label><span>الحصة</span><input id="periodName" autocomplete="off"></label>
         <label><span>اليوم</span><input id="visitDay" autocomplete="off"></label>
-        <label><span>التاريخ</span><input id="visitDate" autocomplete="off" inputmode="numeric" placeholder="هجري"></label>
+        <label><span>التاريخ الهجري</span>
+          <div class="hijri-date">
+            <select id="hijriDay" aria-label="اليوم الهجري"><option value="">اليوم</option></select>
+            <select id="hijriMonth" aria-label="الشهر الهجري"><option value="">الشهر</option></select>
+            <select id="hijriYear" aria-label="السنة الهجرية"><option value="">السنة</option></select>
+          </div>
+        </label>
         <label class="wide"><span>موضوع الدرس</span><textarea id="lessonTopic" rows="2"></textarea></label>
       </div>
     </div>
@@ -87,6 +93,6 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<script src="visits.js?v=20261110-8"></script>
+<script src="visits.js?v=20261115-1"></script>
 </body>
 </html>
