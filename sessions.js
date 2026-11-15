@@ -5,7 +5,8 @@ const KEY='activationSessionsStandaloneV1';
 const $=id=>document.getElementById(id);
 const W=827,H=1170;
 const COLORS={teal:'#138a8b',green:'#23a576',red:'#d11111',pale:'#e3efd8',gold:'#8b6600',ink:'#050505',soft:'#acd987'};
-const fieldIds=['sessionNumber','sessionDay','sessionDate','specialty','topic','objectives','agenda','recommendations'];
+const fieldIds=['sessionNumber','sessionDay','specialty','topic','objectives','agenda','recommendations'];
+const hijriIds=['hijriDay','hijriMonth','hijriYear'];
 let teachers=['','','',''];
 let barcodeData='',barcodeImg=null,logoImg=null,previewTimer=null;
 
@@ -14,9 +15,53 @@ function notice(msg,error=false){
   n.textContent=msg||'';n.style.color=error?'#a52525':'#157268';
 }
 function field(id){return String(($(id)&&$(id).value)||'').trim()}
+function formatHijriDate(day=field('hijriDay'),month=field('hijriMonth'),year=field('hijriYear')){
+  if(!day||!month||!year)return '';
+  return day.padStart(2,'0')+' / '+month.padStart(2,'0')+' / '+year+' هـ';
+}
+function populateHijriSelects(){
+  const day=$('hijriDay'),month=$('hijriMonth'),year=$('hijriYear');
+  if(!day||!month||!year)return;
+
+  for(let d=1;d<=30;d++){
+    const o=document.createElement('option');o.value=String(d);o.textContent=String(d);day.appendChild(o);
+  }
+
+  const months=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+  months.forEach((name,i)=>{
+    const o=document.createElement('option');o.value=String(i+1);o.textContent=name;month.appendChild(o);
+  });
+
+  for(let y=1440;y<=1460;y++){
+    const o=document.createElement('option');o.value=String(y);o.textContent=String(y)+' هـ';year.appendChild(o);
+  }
+}
+function restoreHijriDate(saved){
+  const day=$('hijriDay'),month=$('hijriMonth'),year=$('hijriYear');
+  if(!day||!month||!year||!saved)return;
+
+  if(saved.hijriDay&&saved.hijriMonth&&saved.hijriYear){
+    day.value=String(saved.hijriDay);
+    month.value=String(saved.hijriMonth);
+    year.value=String(saved.hijriYear);
+    return;
+  }
+
+  const nums=String(saved.sessionDate||'').match(/\d+/g)||[];
+  if(nums.length<3)return;
+  let d=nums[0],m=nums[1],y=nums[2];
+  if(Number(d)>1300){y=nums[0];m=nums[1];d=nums[2]}
+  day.value=String(Number(d));
+  month.value=String(Number(m));
+  year.value=String(Number(y));
+}
 function currentData(){
   const data={teachers:[...teachers],barcodeData};
   fieldIds.forEach(id=>data[id]=field(id));
+  data.hijriDay=field('hijriDay');
+  data.hijriMonth=field('hijriMonth');
+  data.hijriYear=field('hijriYear');
+  data.sessionDate=formatHijriDate(data.hijriDay,data.hijriMonth,data.hijriYear);
   return data;
 }
 function save(show=true){
@@ -29,12 +74,14 @@ function load(){
   try{
     const s=JSON.parse(localStorage.getItem(KEY)||'null');if(!s)return;
     fieldIds.forEach(id=>{if($(id)&&Object.prototype.hasOwnProperty.call(s,id))$(id).value=s[id]||''});
+    restoreHijriDate(s);
     if(Array.isArray(s.teachers)&&s.teachers.length)teachers=s.teachers.map(v=>String(v||''));
     if(s.barcodeData)setBarcodeData(s.barcodeData,false);
   }catch(e){}
 }
 function clearAll(){
   fieldIds.forEach(id=>{if($(id))$(id).value=''});
+  hijriIds.forEach(id=>{if($(id))$(id).value=''});
   teachers=['','','',''];
   barcodeData='';barcodeImg=null;
   $('barcodeInput').value='';
@@ -313,11 +360,13 @@ async function init(){
   logoImg=new Image();logoImg.src='moe-logo.svg?v=20260920-1';
   try{await logoImg.decode()}catch(e){}
 
+  populateHijriSelects();
   load();
   renderTeachers();
   updateBarcodeThumb();
 
   fieldIds.forEach(id=>$(id)&&$(id).addEventListener('input',schedulePreview));
+  hijriIds.forEach(id=>$(id)&&$(id).addEventListener('change',schedulePreview));
   $('addTeacherBtn').addEventListener('click',addTeacher);
   $('barcodeInput').addEventListener('change',e=>readBarcodeFile(e.target.files&&e.target.files[0]));
   $('removeBarcodeBtn').addEventListener('click',()=>{
