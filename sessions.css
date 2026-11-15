@@ -5,7 +5,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;background:#eef3f4;color:var(--ink);font-family:"Tajawal",Tahoma,Arial,sans-serif}
 body{min-height:100vh}
-button,input,textarea{font:inherit}
+button,input,textarea,select{font:inherit}
 .top-nav{
   display:flex;align-items:center;justify-content:space-between;gap:18px;
   padding:22px clamp(16px,3vw,38px);background:#fff;border-bottom:1px solid var(--line);
@@ -35,11 +35,13 @@ button,input,textarea{font:inherit}
 .form-grid label,.stack{display:flex;flex-direction:column;gap:6px}
 .form-grid .wide{grid-column:1/-1}
 label>span{font-size:13px;font-weight:700;color:#304146}
-input,textarea{
+input,textarea,select{
   width:100%;border:1px solid #cfdadd;border-radius:10px;background:#fbfcfc;color:#172126;
   padding:10px 11px;outline:none;transition:.16s;border-color:.16s,box-shadow .16s,background .16s
 }
-input:focus,textarea:focus{border-color:#4ba49a;box-shadow:0 0 0 3px rgba(38,151,137,.12);background:#fff}
+input:focus,textarea:focus,select:focus{border-color:#4ba49a;box-shadow:0 0 0 3px rgba(38,151,137,.12);background:#fff}
+.hijri-date{display:grid;grid-template-columns:.8fr 1.5fr 1fr;gap:7px}
+.hijri-date select{min-width:0;padding-inline:8px}
 textarea{resize:vertical;line-height:1.6}
 .stack+.stack{margin-top:12px}
 .teachers-head,.teacher-row{
