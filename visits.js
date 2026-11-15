@@ -33,7 +33,8 @@ const behaviorCriteria=[
   'المحافظة على الممتلكات والتجهيزات الصفية',
   'تجنب السلوكيات المشتتة لسير الدرس'
 ];
-const fieldIds=['hostTeacher','className','subjectName','periodName','visitDay','visitDate','lessonTopic','teachingStrategies','learnedPractices','visitorName'];
+const fieldIds=['hostTeacher','className','subjectName','periodName','visitDay','lessonTopic','teachingStrategies','learnedPractices','visitorName'];
+const hijriIds=['hijriDay','hijriMonth','hijriYear'];
 const ratings={};
 let logoImg=null,previewTimer=null;
 let sigCtx=null,sigDrawing=false,sigLast=null;
@@ -43,9 +44,54 @@ function notice(msg,error=false){
   n.textContent=msg||''; n.style.color=error?'#a52525':'#157268';
 }
 function field(id){return String(($(id)&&$(id).value)||'').trim()}
+function formatHijriDate(day=field('hijriDay'),month=field('hijriMonth'),year=field('hijriYear')){
+  if(!day||!month||!year)return '';
+  return day.padStart(2,'0')+' / '+month.padStart(2,'0')+' / '+year+' هـ';
+}
+function populateHijriSelects(){
+  const day=$('hijriDay'),month=$('hijriMonth'),year=$('hijriYear');
+  if(!day||!month||!year)return;
+
+  for(let d=1;d<=30;d++){
+    const o=document.createElement('option');o.value=String(d);o.textContent=String(d);day.appendChild(o);
+  }
+
+  const months=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+  months.forEach((name,i)=>{
+    const o=document.createElement('option');o.value=String(i+1);o.textContent=name;month.appendChild(o);
+  });
+
+  for(let y=1440;y<=1460;y++){
+    const o=document.createElement('option');o.value=String(y);o.textContent=String(y)+' هـ';year.appendChild(o);
+  }
+}
+function restoreHijriDate(saved){
+  const day=$('hijriDay'),month=$('hijriMonth'),year=$('hijriYear');
+  if(!day||!month||!year||!saved)return;
+
+  if(saved.hijriDay&&saved.hijriMonth&&saved.hijriYear){
+    day.value=String(saved.hijriDay);
+    month.value=String(saved.hijriMonth);
+    year.value=String(saved.hijriYear);
+    return;
+  }
+
+  const legacyDate=(saved.visitDate)||((saved.fields&&saved.fields.visitDate)||'');
+  const nums=String(legacyDate).match(/\d+/g)||[];
+  if(nums.length<3)return;
+  let d=nums[0],m=nums[1],y=nums[2];
+  if(Number(d)>1300){y=nums[0];m=nums[1];d=nums[2]}
+  day.value=String(Number(d));
+  month.value=String(Number(m));
+  year.value=String(Number(y));
+}
 function currentData(){
   const data={ratings:{...ratings},signature:signatureData()};
   fieldIds.forEach(id=>data[id]=field(id));
+  data.hijriDay=field('hijriDay');
+  data.hijriMonth=field('hijriMonth');
+  data.hijriYear=field('hijriYear');
+  data.visitDate=formatHijriDate(data.hijriDay,data.hijriMonth,data.hijriYear);
   return data;
 }
 function save(show=true){
@@ -67,6 +113,7 @@ function load(){
       if(Object.prototype.hasOwnProperty.call(s,id))$(id).value=s[id]||'';
       else if(legacyFields&&Object.prototype.hasOwnProperty.call(legacyFields,id))$(id).value=legacyFields[id]||'';
     });
+    restoreHijriDate(s);
 
     if(s.ratings)Object.entries(s.ratings).forEach(([g,v])=>setRating(g,v,false));
     if(s.signature)restoreSignature(s.signature);
@@ -77,6 +124,7 @@ function load(){
 }
 function clearAll(){
   fieldIds.forEach(id=>{if($(id))$(id).value=''});
+  hijriIds.forEach(id=>{if($(id))$(id).value=''});
   Object.keys(ratings).forEach(g=>setRating(g,'',false));
   clearSignature(); localStorage.removeItem(KEY); schedulePreview();
   notice('تم مسح بيانات الزيارة فقط.');
@@ -373,9 +421,11 @@ async function init(){
   logoImg.src='moe-logo.svg?v=20260920-1';
   try{await logoImg.decode()}catch(e){}
 
+  populateHijriSelects();
   load();
 
   fieldIds.forEach(id=>$(id)&&$(id).addEventListener('input',schedulePreview));
+  hijriIds.forEach(id=>$(id)&&$(id).addEventListener('change',schedulePreview));
   $('saveBtn').addEventListener('click',()=>save(true));
   $('clearBtn').addEventListener('click',()=>{if(confirm('هل تريدين مسح جميع بيانات الزيارة الحالية؟'))clearAll()});
   $('clearSignatureBtn').addEventListener('click',()=>{clearSignature();notice('تم مسح التوقيع.')});
