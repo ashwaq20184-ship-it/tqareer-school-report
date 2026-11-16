@@ -35,7 +35,7 @@ button,input,textarea,select{font:inherit}
 label.stack,label.wide{display:block}
 .form-grid label,.stack{display:flex;flex-direction:column;gap:6px}
 .form-grid .wide{grid-column:1/-1}
-label>span,.signature-title span{font-size:13px;font-weight:700;color:#304146}
+label>span,.manual-signature>span{font-size:13px;font-weight:700;color:#304146}
 input,textarea,select{
   width:100%;border:1px solid #cfdadd;border-radius:10px;background:#fbfcfc;color:#172126;
   padding:10px 11px;outline:none;transition:.16s;border-color:.16s,box-shadow .16s,background .16s
@@ -61,14 +61,11 @@ textarea{resize:vertical;line-height:1.6}
   font-size:12px;min-width:70px;cursor:pointer
 }
 .segment button.selected{background:#e0f0e7;border-color:#6ba989;color:#144e37;font-weight:700;box-shadow:inset 0 0 0 1px #6ba989}
-.signature-wrap{margin-top:14px}
-.signature-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
-.text-btn{border:0;background:none;color:#8a3434;cursor:pointer;font-size:12px;font-weight:700}
-#signatureCanvas{
-  width:100%;height:150px;display:block;border:1px dashed #aebcc0;border-radius:12px;background:#fff;
-  touch-action:none;cursor:crosshair
+.manual-signature{margin-top:14px}
+.manual-signature-box{
+  width:100%;height:86px;margin-top:7px;border:1px dashed #aebcc0;border-radius:12px;background:#fff
 }
-.signature-wrap small{display:block;margin-top:6px;color:var(--muted)}
+.manual-signature small{display:block;margin-top:6px;color:var(--muted)}
 .actions{display:flex;gap:9px;flex-wrap:wrap;position:sticky;bottom:10px;z-index:20;background:rgba(238,243,244,.92);backdrop-filter:blur(10px);padding:10px;border-radius:14px;border:1px solid rgba(207,218,221,.8)}
 .btn{border:1px solid #cdd9dc;border-radius:10px;padding:10px 14px;background:#fff;color:#263b40;font-weight:700;cursor:pointer}
 .btn.primary{border-color:transparent;color:#fff;background:linear-gradient(90deg,var(--teal),var(--green));margin-inline-start:auto}
