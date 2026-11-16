@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="visits.css?v=20261115-1">
+  <link rel="stylesheet" href="visits.css?v=20261116-1">
 </head>
 <body>
 <header class="top-nav">
@@ -67,10 +67,10 @@
       <label class="stack"><span>استراتيجيات التدريس المنفذة</span><textarea id="teachingStrategies" rows="3"></textarea></label>
       <label class="stack"><span>الممارسات التدريسية المكتسبة</span><textarea id="learnedPractices" rows="3"></textarea></label>
       <label class="stack"><span>اسم المعلمة الزائرة</span><input id="visitorName" autocomplete="off"></label>
-      <div class="signature-wrap">
-        <div class="signature-title"><span>توقيع الزائرة</span><button id="clearSignatureBtn" class="text-btn" type="button">مسح التوقيع</button></div>
-        <canvas id="signatureCanvas" width="900" height="220"></canvas>
-        <small>استخدمي الإصبع أو الماوس للرسم داخل المربع.</small>
+      <div class="manual-signature">
+        <span>توقيع الزائرة بعد الطباعة</span>
+        <div class="manual-signature-box" aria-hidden="true"></div>
+        <small>تُترك الخانة فارغة للتوقيع اليدوي بعد الطباعة.</small>
       </div>
     </div>
 
@@ -93,6 +93,6 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<script src="visits.js?v=20261115-1"></script>
+<script src="visits.js?v=20261116-1"></script>
 </body>
 </html>
