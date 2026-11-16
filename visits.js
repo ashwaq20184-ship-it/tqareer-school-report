@@ -37,7 +37,6 @@ const fieldIds=['hostTeacher','className','subjectName','periodName','visitDay',
 const hijriIds=['hijriDay','hijriMonth','hijriYear'];
 const ratings={};
 let logoImg=null,previewTimer=null;
-let sigCtx=null,sigDrawing=false,sigLast=null;
 
 function notice(msg,error=false){
   const n=$('notice'); if(!n)return;
@@ -86,7 +85,7 @@ function restoreHijriDate(saved){
   year.value=String(Number(y));
 }
 function currentData(){
-  const data={ratings:{...ratings},signature:signatureData()};
+  const data={ratings:{...ratings}};
   fieldIds.forEach(id=>data[id]=field(id));
   data.hijriDay=field('hijriDay');
   data.hijriMonth=field('hijriMonth');
@@ -116,7 +115,6 @@ function load(){
     restoreHijriDate(s);
 
     if(s.ratings)Object.entries(s.ratings).forEach(([g,v])=>setRating(g,v,false));
-    if(s.signature)restoreSignature(s.signature);
 
     // ترحيل البيانات القديمة تلقائيًا إلى البنية الجديدة.
     localStorage.setItem(KEY,JSON.stringify(currentData()));
@@ -126,7 +124,7 @@ function clearAll(){
   fieldIds.forEach(id=>{if($(id))$(id).value=''});
   hijriIds.forEach(id=>{if($(id))$(id).value=''});
   Object.keys(ratings).forEach(g=>setRating(g,'',false));
-  clearSignature(); localStorage.removeItem(KEY); schedulePreview();
+  localStorage.removeItem(KEY); schedulePreview();
   notice('تم مسح بيانات الزيارة فقط.');
 }
 
@@ -154,27 +152,6 @@ function initCriteria(){
   buildCriterionList('rightCriteria',rightCriteria,'right',[['ok','مناسب'],['not','غير مناسب']]);
   buildCriterionList('middleCriteria',middleCriteria,'middle',[['ok','مناسب'],['not','غير مناسب']]);
   buildCriterionList('behaviorCriteria',behaviorCriteria,'behavior',[['yes','متحقق'],['partial','متحقق جزئيًا'],['no','غير متحقق']]);
-}
-
-function setupSignature(){
-  const c=$('signatureCanvas'); if(!c)return;
-  sigCtx=c.getContext('2d'); sigCtx.strokeStyle='#111'; sigCtx.lineWidth=4; sigCtx.lineCap='round'; sigCtx.lineJoin='round';
-  const point=e=>{const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}};
-  c.addEventListener('pointerdown',e=>{e.preventDefault();sigDrawing=true;sigLast=point(e);c.setPointerCapture&&c.setPointerCapture(e.pointerId)});
-  c.addEventListener('pointermove',e=>{if(!sigDrawing)return;e.preventDefault();const p=point(e);sigCtx.beginPath();sigCtx.moveTo(sigLast.x,sigLast.y);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();sigLast=p;schedulePreview()});
-  const stop=e=>{if(!sigDrawing)return;sigDrawing=false;sigLast=null;try{c.releasePointerCapture&&c.releasePointerCapture(e.pointerId)}catch(_){}schedulePreview()};
-  c.addEventListener('pointerup',stop);c.addEventListener('pointercancel',stop);
-}
-function clearSignature(){const c=$('signatureCanvas');if(sigCtx&&c)sigCtx.clearRect(0,0,c.width,c.height);schedulePreview()}
-function signatureData(){
-  const c=$('signatureCanvas'); if(!sigCtx||!c)return'';
-  const d=sigCtx.getImageData(0,0,c.width,c.height).data;
-  for(let i=3;i<d.length;i+=4)if(d[i])return c.toDataURL('image/png');
-  return'';
-}
-function restoreSignature(data){
-  clearSignature(); if(!data||!sigCtx)return;
-  const im=new Image();im.onload=()=>{sigCtx.drawImage(im,0,0,$('signatureCanvas').width,$('signatureCanvas').height);schedulePreview()};im.src=data;
 }
 
 function ctxBase(ctx){
@@ -356,7 +333,6 @@ function drawClosingSections(ctx,data){
   rect(ctx,x,y+20,238,22,'#fff');rect(ctx,x+238,y+20,121,22,COLORS.pale);centerText(ctx,'الاسم',x+238,y+20,121,22,12,COLORS.red,700);
   rect(ctx,x,y+42,238,22,'#fff');rect(ctx,x+238,y+42,121,22,COLORS.pale);centerText(ctx,'التوقيع',x+238,y+42,121,22,12,COLORS.red,700);
   fitBoxText(ctx,data.visitorName,x,y+20,238,22,{size:11,min:8,weight:500});
-  if(data.signature&&$('signatureCanvas'))ctx.drawImage($('signatureCanvas'),x+5,y+45,228,16);
 }
 
 function drawPage1(ctx,data){
@@ -415,7 +391,7 @@ async function exportPdf(){
 }
 
 async function init(){
-  initCriteria();setupSignature();
+  initCriteria();
 
   logoImg=new Image();
   logoImg.src='moe-logo.svg?v=20260920-1';
@@ -428,7 +404,6 @@ async function init(){
   hijriIds.forEach(id=>$(id)&&$(id).addEventListener('change',schedulePreview));
   $('saveBtn').addEventListener('click',()=>save(true));
   $('clearBtn').addEventListener('click',()=>{if(confirm('هل تريدين مسح جميع بيانات الزيارة الحالية؟'))clearAll()});
-  $('clearSignatureBtn').addEventListener('click',()=>{clearSignature();notice('تم مسح التوقيع.')});
   $('pdfBtn').addEventListener('click',async()=>{
     const b=$('pdfBtn'),old=b.textContent;
     b.disabled=true;b.textContent='جارٍ إنشاء PDF...';notice('جارٍ إنشاء النموذج النهائي...');
