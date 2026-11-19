@@ -213,6 +213,13 @@
       .ipr-sign.ipr-three{grid-template-columns:repeat(3,1fr)}
       .ipr-sign.ipr-two{grid-template-columns:repeat(2,1fr)}
       .ipr-sign.ipr-report-sign{position:static;left:auto;right:auto;top:auto;bottom:auto;width:100%;margin-top:22px;display:block}
+      .ipr-sign.ipr-report-sign.ipr-with-inline-evidence{display:grid;grid-template-columns:185px minmax(0,1fr);gap:18px;align-items:center;direction:ltr}
+      .ipr-sign-content{direction:rtl;min-width:0}
+      .ipr-inline-evidence{direction:rtl;width:185px;text-align:center;align-self:center}
+      .ipr-inline-evidence-label{font-size:13px;font-weight:700;color:${title};margin-bottom:6px}
+      .ipr-inline-evidence-frame{width:158px;height:158px;margin:0 auto;border:1.5px solid #c7c7c7;border-radius:8px;padding:7px;background:#fff;display:flex;align-items:center;justify-content:center}
+      .ipr-inline-evidence-frame img{display:block;width:100%;height:100%;object-fit:contain;background:#fff}
+      .ipr-inline-evidence-caption{margin-top:5px;font-size:11.5px;line-height:1.35;color:#333;font-weight:500;max-height:31px;overflow:hidden}
       .ipr-signature-only-page .ipr-table{top:650px}
       .ipr-preparer-row{text-align:right;padding:0 8px 12px 8px;white-space:nowrap}
       .ipr-preparer-row .ipr-sign-label{display:inline;margin:0 0 0 6px}
@@ -513,6 +520,58 @@
     return pages;
   }
 
+  function isBarcodeLikeEvidence(img,title){
+    if(!img)return false;
+    const w=Number(img.naturalWidth)||0;
+    const h=Number(img.naturalHeight)||0;
+    if(!w||!h)return false;
+
+    const ratio=w/h;
+    const caption=String(title||'').trim().toLowerCase();
+    const hinted=/بار\s*كود|qr|كيو\s*آر|كيو\s*ار/.test(caption);
+
+    // أغلب QR والباركود المستخدم كشاهد يكون مربعًا أو قريبًا من المربع.
+    return hinted || (ratio>=0.78 && ratio<=1.28);
+  }
+
+  function tryMergeSingleBarcodeEvidence(reportPages,evidencePages,d){
+    const imgs=(d.images||[]).slice(0,12);
+    if(imgs.length!==1 || reportPages.length!==1 || evidencePages.length!==1)return false;
+
+    const reportPage=reportPages[0];
+    const evidencePage=evidencePages[0];
+    const sourceImg=evidencePage.querySelector('.ipr-card img');
+    const title=String((d.evidenceTitles||[])[0]||'').trim();
+    if(!isBarcodeLikeEvidence(sourceImg,title))return false;
+
+    const sign=reportPage.querySelector('.ipr-report-sign');
+    const table=reportPage.querySelector('.ipr-table table');
+    if(!sign||!table)return false;
+
+    const tableBottomY=tableBottom(reportPage);
+    const signContentHeight=Math.max(sign.offsetHeight,58);
+    const evidenceHeight=title?205:184;
+    const mergedHeight=Math.max(signContentHeight,evidenceHeight);
+    const safeBottom=CSS_H-48;
+
+    // الدمج لا يتم إلا إذا استوعبت الصفحة الباركود والاعتمادات بدون ضغط أو تداخل.
+    if(tableBottomY+22+mergedHeight>safeBottom)return false;
+
+    const content=document.createElement('div');
+    content.className='ipr-sign-content';
+    while(sign.firstChild)content.appendChild(sign.firstChild);
+
+    const evidence=document.createElement('div');
+    evidence.className='ipr-inline-evidence';
+    evidence.innerHTML='<div class="ipr-inline-evidence-label">الشاهد</div>'
+      +'<div class="ipr-inline-evidence-frame"><img alt="شاهد باركود" src="'+sourceImg.src+'"></div>'
+      +(title?'<div class="ipr-inline-evidence-caption">'+esc(title)+'</div>':'');
+
+    sign.classList.add('ipr-with-inline-evidence');
+    sign.append(evidence,content);
+    evidencePage.remove();
+    return true;
+  }
   function classifyEvidenceCards(root){
     root.querySelectorAll('.ipr-card img').forEach(img=>{
       const card=img.closest('.ipr-card');
@@ -645,7 +704,6 @@
       // المرور الثاني هو الذي نعتمد عليه في التقسيم النهائي.
       const reportPages=buildReportPages(root,d);
       const evidencePages=buildEvidencePages(root,d);
-      const pages=[...reportPages,...evidencePages];
 
       await waitForImages(root);
       classifyEvidenceCards(root);
@@ -653,6 +711,15 @@
       await nextAnimationFrame();
       await ensureReportFontsReady();
       await settleVirtualLayout(root,reportPages);
+
+      const mergedSingleBarcode=tryMergeSingleBarcodeEvidence(reportPages,evidencePages,d);
+      if(mergedSingleBarcode){
+        await waitForImages(root);
+        void root.offsetHeight;
+        await nextAnimationFrame();
+      }
+
+      const pages=mergedSingleBarcode?[...reportPages]:[...reportPages,...evidencePages];
 
       const doc=await PDFLib.PDFDocument.create();
       for(let i=0;i<pages.length;i++){
