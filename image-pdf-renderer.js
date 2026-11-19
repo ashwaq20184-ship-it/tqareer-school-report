@@ -213,11 +213,11 @@
       .ipr-sign.ipr-three{grid-template-columns:repeat(3,1fr)}
       .ipr-sign.ipr-two{grid-template-columns:repeat(2,1fr)}
       .ipr-sign.ipr-report-sign{position:static;left:auto;right:auto;top:auto;bottom:auto;width:100%;margin-top:22px;display:block}
-      .ipr-sign.ipr-report-sign.ipr-with-inline-evidence{display:grid;grid-template-columns:185px minmax(0,1fr);gap:18px;align-items:center;direction:ltr}
+      .ipr-sign.ipr-report-sign.ipr-with-inline-evidence{display:block;direction:rtl}
       .ipr-sign-content{direction:rtl;min-width:0}
-      .ipr-inline-evidence{direction:rtl;width:185px;text-align:center;align-self:center}
+      .ipr-inline-evidence{direction:rtl;width:100%;text-align:center;margin:0 auto 14px}
       .ipr-inline-evidence-label{font-size:13px;font-weight:700;color:${title};margin-bottom:6px}
-      .ipr-inline-evidence-frame{width:158px;height:158px;margin:0 auto;border:1.5px solid #c7c7c7;border-radius:8px;padding:7px;background:#fff;display:flex;align-items:center;justify-content:center}
+      .ipr-inline-evidence-frame{width:138px;height:138px;margin:0 auto;border:1.5px solid #c7c7c7;border-radius:8px;padding:7px;background:#fff;display:flex;align-items:center;justify-content:center}
       .ipr-inline-evidence-frame img{display:block;width:100%;height:100%;object-fit:contain;background:#fff}
       .ipr-inline-evidence-caption{margin-top:5px;font-size:11.5px;line-height:1.35;color:#333;font-weight:500;max-height:31px;overflow:hidden}
       .ipr-signature-only-page .ipr-table{top:650px}
@@ -550,8 +550,8 @@
 
     const tableBottomY=tableBottom(reportPage);
     const signContentHeight=Math.max(sign.offsetHeight,58);
-    const evidenceHeight=title?205:184;
-    const mergedHeight=Math.max(signContentHeight,evidenceHeight);
+    const evidenceHeight=title?178:160;
+    const mergedHeight=evidenceHeight+14+signContentHeight;
     const safeBottom=CSS_H-48;
 
     // الدمج لا يتم إلا إذا استوعبت الصفحة الباركود والاعتمادات بدون ضغط أو تداخل.
